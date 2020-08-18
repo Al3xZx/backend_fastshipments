@@ -3,7 +3,8 @@ package com.fastshipmentsdev.backend_fastshipments.d_entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "merce", uniqueConstraints = @UniqueConstraint(columnNames = {"indice_rotazione", "indice_posizione", "scaffale"}))
+//@Table(name = "merce", uniqueConstraints = @UniqueConstraint(columnNames = {"indice_rotazione", "indice_posizione", "scaffale"}))
+@Table(name = "merce")
 public class Merce {
 
     @Id
