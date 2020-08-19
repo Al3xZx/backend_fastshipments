@@ -1,5 +1,7 @@
 package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,21 +25,21 @@ public class Fattura {
     private Integer idFattura;
 
     @Column(nullable = false)
-    private Integer numero;
-
-    @Column(nullable = false)
     private Double imponibile;
 
     @Column(nullable = false)
     private Double totale;
 
     @OneToMany(mappedBy = "fattura")
+    @JsonIgnore
     private List<AbbonamentoSottoscritto> abbonamentiSottoscritti = new LinkedList<>();
 
     @OneToMany(mappedBy = "fattura")
+    @JsonIgnore
     private List<AbbonamentoMagazzinoSottoscritto> abbonamentiMagazzinoSottoscritti = new LinkedList<>();
 
     @OneToMany(mappedBy = "fattura")
+    @JsonIgnore
     private List<Spedizione> spedizioni = new LinkedList<>();
 
     @ManyToOne
@@ -50,14 +52,6 @@ public class Fattura {
 
     public void setIdFattura(Integer idFattura) {
         this.idFattura = idFattura;
-    }
-
-    public Integer getNumero() {
-        return numero;
-    }
-
-    public void setNumero(Integer numero) {
-        this.numero = numero;
     }
 
     public Double getImponibile() {

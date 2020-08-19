@@ -1,5 +1,6 @@
 package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.jdi.JDIPermission;
 
 import javax.persistence.*;
@@ -39,6 +40,7 @@ public class Dipendente {
 
     @ManyToOne
     @JoinColumn(nullable = false)
+    @JsonIgnore
     private Hub hubLavoro;
 
     @ManyToOne

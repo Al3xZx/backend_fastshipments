@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccountClienteRepository extends JpaRepository<AccountCliente, Integer> {
 
-    @Query(value = "SELECT * FROM account_cliente a WHERE a.username = ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM account_cliente AS a WHERE a.username_id_cliente = ?1", nativeQuery = true)
     AccountCliente findByIdCliente(Integer idCliente);
 
 }

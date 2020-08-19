@@ -1,5 +1,7 @@
 package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -13,7 +15,7 @@ public class AbbonamentoSottoscritto {
     private Integer idAbbonamentoSottoscritto;
 
     @Column(nullable = false, length = 500)
-    private LocalDateTime dataInizio;
+    private LocalDateTime dataInizio = LocalDateTime.now();
 
     @Column(nullable = false, length = 500)
     private LocalDateTime dataFine;

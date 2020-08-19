@@ -1,5 +1,7 @@
 package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -40,15 +42,19 @@ public class Cliente {
     private String cf;
 
     @OneToMany(mappedBy = "cliente")
+    @JsonIgnore
     private Set<AbbonamentoSottoscritto> abbonamenti = new TreeSet<>();
 
     @OneToMany(mappedBy = "cliente")
+    @JsonIgnore
     private Set<AbbonamentoMagazzinoSottoscritto> abbonamentiMagazzino = new TreeSet<>();
 
     @OneToMany(mappedBy = "cliente")
+    @JsonIgnore
     private Set<Fattura> fatture = new TreeSet<>();
 
     @OneToMany(mappedBy = "proprietario")
+    @JsonIgnore
     private List<Merce> merceProprietario = new LinkedList<>();
 
     public Integer getIdCliente() {

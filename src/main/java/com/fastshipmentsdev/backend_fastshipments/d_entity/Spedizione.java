@@ -56,7 +56,7 @@ public class Spedizione {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    private Cliente mittente;
+    private Cliente mittente; //il cliente che spedisce.
 
     @ManyToOne
     @JoinColumn
