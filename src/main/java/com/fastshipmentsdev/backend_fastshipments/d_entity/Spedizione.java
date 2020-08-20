@@ -1,5 +1,8 @@
 package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
@@ -47,6 +50,10 @@ public class Spedizione {
 
     @Column(nullable = false)
     private String indirizzoDestinatario;
+
+    @Transient
+    @JsonInclude
+    private Indirizzo indirizzo;
 
     @Column(nullable = false)
     private Double volume;

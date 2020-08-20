@@ -26,7 +26,7 @@ public class SpedizioneService {
     MerceRepository merceRepository;
 
     @Transactional(readOnly = false)
-    public Spedizione aggiungi(Spedizione s ) throws ClienteNonEsistenteException {
+    public Spedizione aggiungi(Spedizione s) throws ClienteNonEsistenteException {
 
         Optional<Cliente> c = clienteRepository.findById(s.getMittente().getIdCliente());
         if(!c.isPresent()) throw new ClienteNonEsistenteException();
