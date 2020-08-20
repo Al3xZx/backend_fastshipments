@@ -28,6 +28,7 @@ public class ClienteService {
         AccountCliente accountCliente = new AccountCliente();
         accountCliente.setUsername(c);
         accountCliente.setPassword(password);
+        c.setIndirizzo(c.getIndirizzoCliente().toString());
         clienteRepository.save(c);
         accountClienteRepository.save(accountCliente);
         return accountCliente;

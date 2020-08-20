@@ -20,6 +20,9 @@ public class AbbonamentoSottoscritto {
     @Column(nullable = false, length = 500)
     private LocalDateTime dataFine;
 
+    @Column(nullable = false)
+    private Integer spedizioniEffettuate = 0;
+
     @ManyToOne
     @JoinColumn(nullable = false)
     private Cliente cliente;
@@ -78,5 +81,13 @@ public class AbbonamentoSottoscritto {
 
     public void setFattura(Fattura fattura) {
         this.fattura = fattura;
+    }
+
+    public Integer getSpedizioniEffettuate() {
+        return spedizioniEffettuate;
+    }
+
+    public void setSpedizioniEffettuate(Integer spedizioniEffettuate) {
+        this.spedizioniEffettuate = spedizioniEffettuate;
     }
 }

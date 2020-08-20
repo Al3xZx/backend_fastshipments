@@ -1,5 +1,7 @@
 package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,18 +23,23 @@ public class Hub {
     private Double volumeDisponibile;
 
     @OneToMany(mappedBy = "hub")
+    @JsonIgnore
     private List<Scaffale> scaffali = new LinkedList<>();
 
     @OneToMany(mappedBy = "hubLavoro")
+    @JsonIgnore
     private List<Dipendente> dipendenti = new LinkedList<>();
 
     @OneToMany(mappedBy = "hubPartenza")
+    @JsonIgnore
     private List<Spedizione> spedizioniPartenza = new LinkedList<>();
 
     @OneToMany(mappedBy = "hubDestinazione")
+    @JsonIgnore
     private List<Spedizione> spedizioniArrivo = new LinkedList<>();
 
     @ManyToMany(mappedBy = "hubPassaggio")
+    @JsonIgnore
     private List<Spedizione> spedizioniPassaggio = new LinkedList<>();
 
     public Integer getIdHub() {

@@ -3,6 +3,7 @@ package com.fastshipmentsdev.backend_fastshipments.a_controller;
 import com.fastshipmentsdev.backend_fastshipments.b_service.AbbonamentoMagazzinoService;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.AbbonamentoMagazzinoSottoscritto;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.CartaCredito;
+import com.fastshipmentsdev.backend_fastshipments.d_entity.Merce;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,34 @@ public class AbbonamentoMagazzinoController {
             return new ResponseEntity(abbonamentoMagazzinoService.abbonamentiMagazzinoSottoscritti(idCliente),HttpStatus.OK);
         } catch (ClienteNonEsistenteException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
+        }
+    }
+
+    @PostMapping(value = "/richiesta_ritiro/{idCliente}/{idAbbonamento}/{numeroMerci}")
+    public ResponseEntity richiestaRitiroMerce(@PathVariable int idCliente, @PathVariable int idAbbonamentoMagazzinoSottoscritto, @RequestBody Merce merce, @PathVariable int numeroMerci){
+        try {
+            return new ResponseEntity(abbonamentoMagazzinoService.richiestaRitiroMerce(idCliente, idAbbonamentoMagazzinoSottoscritto, merce, numeroMerci), HttpStatus.OK);
+        } catch (ClienteNonEsistenteException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
+        } catch (AbbonamentoNonEsistenteException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non esiste", e);
+        } catch (SpazioNonDisponibileException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Non c'è spazio a sufficienza con l'abbonamento sottoscritto", e);
+        } catch (AbbonamentoNonAssociatoException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non è associato al cliente", e);
+        }
+    }
+
+    @GetMapping(value = "/ricerca_merce/{idCliente}/{idAbbonamento}/{descrizione}")
+    public ResponseEntity ricercaMerceDescr(int idCliente, int idAbbonamento, String descrizione){
+        try {
+            return new ResponseEntity(abbonamentoMagazzinoService.ricercaMerceDescr(idCliente, idAbbonamento, descrizione), HttpStatus.OK);
+        } catch (ClienteNonEsistenteException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
+        } catch (AbbonamentoNonEsistenteException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non esiste", e);
+        } catch (AbbonamentoNonAssociatoException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non è associato al cliente", e);
         }
     }
 }

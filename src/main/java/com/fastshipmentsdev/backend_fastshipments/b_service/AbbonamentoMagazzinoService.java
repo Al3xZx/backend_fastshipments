@@ -2,12 +2,14 @@ package com.fastshipmentsdev.backend_fastshipments.b_service;
 
 import com.fastshipmentsdev.backend_fastshipments.c_repository.*;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.*;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.StatoMerce;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -32,6 +34,9 @@ public class AbbonamentoMagazzinoService {
 
     @Autowired
     HubRepository hubRepository;
+
+    @Autowired
+    MerceRepository merceRepository;
 
 
     @Transactional(readOnly = true)
@@ -87,9 +92,55 @@ public class AbbonamentoMagazzinoService {
         cartaCreditoP.setSaldoDisponibile(cartaCreditoP.getSaldoDisponibile()-totale);
     }
 
+    @Transactional(readOnly = true)
     public Set<AbbonamentoMagazzinoSottoscritto> abbonamentiMagazzinoSottoscritti(int idCliente) throws ClienteNonEsistenteException {
         Optional<Cliente> oC = clienteRepository.findById(idCliente);
         if(!oC.isPresent()) throw new ClienteNonEsistenteException();
         return oC.get().getAbbonamentiMagazzino();
+    }
+
+    @Transactional(readOnly = false)
+    public List<Merce> richiestaRitiroMerce(int idCliente, int idAbbonamentoMagazzinoSottoscritto, Merce merce, int numeroMerci)
+            throws ClienteNonEsistenteException, AbbonamentoNonEsistenteException, SpazioNonDisponibileException, AbbonamentoNonAssociatoException {
+        Optional<Cliente> oC = clienteRepository.findById(idCliente);
+        if(!oC.isPresent()) throw new ClienteNonEsistenteException();
+        Optional<AbbonamentoMagazzinoSottoscritto> oAMS = abbonamentoMagazzinoSottoscrittoRepository.findById(idAbbonamentoMagazzinoSottoscritto);
+        if(!oAMS.isPresent()) throw new AbbonamentoNonEsistenteException();
+        AbbonamentoMagazzinoSottoscritto AMS = oAMS.get();
+        if(!AMS.getCliente().getIdCliente().equals(idCliente))
+            throw new AbbonamentoNonAssociatoException();
+        double volumeMerce = merce.getVolume();
+        if(AMS.getAbbonamentoMagazzino().getVolumeDisponibile().compareTo(AMS.getVolumeUtilizzato()+(volumeMerce*numeroMerci))<0)
+            throw new SpazioNonDisponibileException();
+        AMS.setVolumeUtilizzato(AMS.getVolumeUtilizzato()+(volumeMerce*numeroMerci));
+        merce.setStato(StatoMerce.DA_RITIRARE);
+        List<Merce> ret = new LinkedList<>();
+        for (int i = 0; i < numeroMerci; i++) {
+            Merce mTMP = merceRepository.save(merce);
+            ret.add(mTMP);
+        }
+        return ret;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Merce> ricercaMerceDescr(int idCliente, int idAbbonamentoMagazzinoSottoscritto, String descrizione)
+            throws ClienteNonEsistenteException, AbbonamentoNonEsistenteException, AbbonamentoNonAssociatoException {
+        Optional<Cliente> oC = clienteRepository.findById(idCliente);
+        if(!oC.isPresent()) throw new ClienteNonEsistenteException();
+        Optional<AbbonamentoMagazzinoSottoscritto> oAMS = abbonamentoMagazzinoSottoscrittoRepository.findById(idAbbonamentoMagazzinoSottoscritto);
+        if(!oAMS.isPresent()) throw new AbbonamentoNonEsistenteException();
+        AbbonamentoMagazzinoSottoscritto AMS = oAMS.get();
+        if(!AMS.getCliente().getIdCliente().equals(idCliente))
+            throw new AbbonamentoNonAssociatoException();
+        Hub hub = AMS.getHub();
+        //TODO verificare
+        List<Merce> ret = new LinkedList<>();
+        for (Scaffale s: hub.getScaffali()) {
+            for (Merce m: s.getMerci()) {
+                if(m.getDescrizione().contains(descrizione))
+                    ret.add(m);
+            }
+        }
+        return  ret;
     }
 }

@@ -1,5 +1,7 @@
 package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +20,7 @@ public class Scaffale {
 
     @ManyToOne
     @JoinColumn
+    @JsonIgnore
     private Hub hub;
 
     @OneToMany(mappedBy = "scaffale")

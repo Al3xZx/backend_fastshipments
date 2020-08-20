@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.jdi.JDIPermission;
 
 import javax.persistence.*;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Table(name = "dipendente")
@@ -46,6 +48,9 @@ public class Dipendente {
     @ManyToOne
     @JoinColumn
     private AreaDiCompetenza areaDiCompetenza;
+
+    @OneToMany(mappedBy = "traspRitiro")
+    private List<Spedizione> spedizioniDaRitirare = new LinkedList<>();
 
     public Integer getIdDipendente() {
         return idDipendente;
@@ -133,5 +138,13 @@ public class Dipendente {
 
     public void setAreaDiCompetenza(AreaDiCompetenza areaDiCompetenza) {
         this.areaDiCompetenza = areaDiCompetenza;
+    }
+
+    public List<Spedizione> getSpedizioniDaRitirare() {
+        return spedizioniDaRitirare;
+    }
+
+    public void setSpedizioniDaRitirare(List<Spedizione> spedizioniDaRitirare) {
+        this.spedizioniDaRitirare = spedizioniDaRitirare;
     }
 }

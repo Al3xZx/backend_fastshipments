@@ -76,37 +76,11 @@ public class AbbonamentoService {
         cartaCreditoP.setSaldoDisponibile(cartaCreditoP.getSaldoDisponibile()-totale);
     }
 
+    @Transactional(readOnly = true)
     public Set<AbbonamentoSottoscritto> abbonamentiSottoscritti(int idCliente) throws ClienteNonEsistenteException {
         Optional<Cliente> oC = clienteRepository.findById(idCliente);
         if(!oC.isPresent()) throw new ClienteNonEsistenteException();
         return oC.get().getAbbonamenti();
     }
-
-//    @Transactional(readOnly = false)
-//    public Abbonamento aggiungiAbbonamento (Abbonamento a) {
-//        Optional<Dipendente> direttoreVendite = dipendenteRepository.findById(a.getDirettoreVendite().getIdDipendente());
-//        if(!oA.isPresent()) throw new DipendenteNonEsistenteException();
-//        return abbonamentoRepository.save(a);
-//    }
-//
-//    @Transactional(readOnly = false)
-//    public Abbonamento modifica(int idAbbonamento, Abbonamento a) throws AbbonamentoNonEsistenteException {
-//        Optional<Abbonamento> oA = abbonamentoRepository.findById(idAbbonamento);
-//        if(!oA.isPresent()) throw new AbbonamentoNonEsistenteException();
-//        Abbonamento abbonamentoP = oA.get();
-//        abbonamentoP.setCosto(a.getCosto());
-//        abbonamentoP.setDescrizione(a.getDescrizione());
-//        abbonamentoP.setDirettoreVendite(a.getDirettoreVendite());
-//        abbonamentoP.setDurata(a.getDurata());
-//        abbonamentoP.setNumeroSpedizioni(a.getNumeroSpedizioni());
-//        return abbonamentoP;
-//    }
-//
-//    @Transactional(readOnly = false)
-//    public void elimina (int idAbbonamento) throws AbbonamentoNonEsistenteException {
-//        Optional<Abbonamento> oA = abbonamentoRepository.findById(idAbbonamento);
-//        if(!oA.isPresent()) throw new AbbonamentoNonEsistenteException();
-//        abbonamentoRepository.deleteById(idAbbonamento);
-//    }
 
 }

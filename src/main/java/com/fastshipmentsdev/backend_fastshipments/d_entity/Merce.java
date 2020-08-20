@@ -1,5 +1,7 @@
 package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -13,16 +15,19 @@ public class Merce {
     private Integer idMerce;
 
     @Column(nullable = false)
-    private Double volume;
+    private Double volume;//VOLUME OCCUPATO
 
-    @Column(nullable = false, name = "indice_rotazione")
+    @Column(nullable = false)
+    private String descrizione;
+
+    @Column(nullable = true, name = "indice_rotazione")
     private Integer indiceRotazione;
 
-    @Column(nullable = false, name = "indice_posizione")
+    @Column(nullable = true, name = "indice_posizione")
     private Integer indicePosizione;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = true)
     private Scaffale scaffale;
 
     @Column(nullable = false)
@@ -30,6 +35,7 @@ public class Merce {
 
     @ManyToOne
     @JoinColumn
+    @JsonIgnore
     private Spedizione spedizione;
 
     @ManyToOne
@@ -98,5 +104,13 @@ public class Merce {
 
     public void setProprietario(Cliente proprietario) {
         this.proprietario = proprietario;
+    }
+
+    public String getDescrizione() {
+        return descrizione;
+    }
+
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
     }
 }

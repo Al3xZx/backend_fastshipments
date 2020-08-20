@@ -1,6 +1,8 @@
 package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
 
 import javax.persistence.*;
 import java.util.*;
@@ -26,6 +28,10 @@ public class Cliente {
 
     @Column(nullable = false, length = 150)
     private String indirizzo;
+
+    @Transient
+    @JsonInclude
+    private Indirizzo indirizzoCliente;
 
     @Column(nullable = false, length = 50)
     private String email;
@@ -159,5 +165,13 @@ public class Cliente {
 
     public void setMerceProprietario(List<Merce> merceProprietario) {
         this.merceProprietario = merceProprietario;
+    }
+
+    public Indirizzo getIndirizzoCliente() {
+        return indirizzoCliente;
+    }
+
+    public void setIndirizzoCliente(Indirizzo indirizzoCliente) {
+        this.indirizzoCliente = indirizzoCliente;
     }
 }

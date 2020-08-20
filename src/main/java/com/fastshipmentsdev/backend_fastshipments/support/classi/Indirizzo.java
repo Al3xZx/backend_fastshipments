@@ -118,11 +118,12 @@ public class Indirizzo {
         return ret;
     }
 
-    public static void main(String[] args) {
-        Indirizzo i = new Indirizzo("calabria","mangone","cs", "Paolo", "Cundari", "test", "25");
-        System.out.println(i);
-        Indirizzo i2 = Indirizzo.parse(i.toString());
-        System.out.println("nuovo indirizzo");
-        System.out.println(i);
-    }
+//    public static void main(String[] args) {
+//        Indirizzo i = new Indirizzo("calabria","mangone","cs", "Paolo", "Cundari", "test", "25");
+//        System.out.println(i);
+//        Indirizzo i2 = Indirizzo.parse(i.toString());
+//        System.out.println("nuovo indirizzo");
+//        System.out.println(i);
+//    }
+
 }

@@ -2,6 +2,7 @@ package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
+import org.w3c.dom.ls.LSProgressEvent;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -55,6 +56,8 @@ public class Spedizione {
     @JsonInclude
     private Indirizzo indirizzo;
 
+    private String stato;
+
     @Column(nullable = false)
     private Double volume;
 
@@ -96,6 +99,9 @@ public class Spedizione {
             inverseJoinColumns = @JoinColumn(name = "hub", referencedColumnName = "idHub")
     )
     private Set<Hub> hubPassaggio = new TreeSet<>();
+
+    @OneToMany(mappedBy = "spedizione")
+    private List<Merce> merci = new LinkedList<>();
 
     @ManyToOne
     @JoinColumn
@@ -211,5 +217,29 @@ public class Spedizione {
 
     public void setFattura(Fattura fattura) {
         this.fattura = fattura;
+    }
+
+    public Indirizzo getIndirizzo() {
+        return indirizzo;
+    }
+
+    public void setIndirizzo(Indirizzo indirizzo) {
+        this.indirizzo = indirizzo;
+    }
+
+    public List<Merce> getMerci() {
+        return merci;
+    }
+
+    public void setMerci(List<Merce> merci) {
+        this.merci = merci;
+    }
+
+    public String getStato() {
+        return stato;
+    }
+
+    public void setStato(String stato) {
+        this.stato = stato;
     }
 }

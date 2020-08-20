@@ -14,10 +14,13 @@ public class AbbonamentoMagazzinoSottoscritto {
     private Integer idAbbonamento;
 
     @Column(nullable = false, length = 500)
-    private LocalDateTime dataInizio;
+    private LocalDateTime dataInizio = LocalDateTime.now();
 
     @Column(nullable = false, length = 500)
     private LocalDateTime dataFine;
+
+    @Column(nullable = false)
+    private Double volumeUtilizzato = 0.0;
 
     @ManyToOne
     @JoinColumn(nullable = false)
@@ -89,5 +92,13 @@ public class AbbonamentoMagazzinoSottoscritto {
 
     public void setFattura(Fattura fattura) {
         this.fattura = fattura;
+    }
+
+    public Double getVolumeUtilizzato() {
+        return volumeUtilizzato;
+    }
+
+    public void setVolumeUtilizzato(Double volumeUtilizzato) {
+        this.volumeUtilizzato = volumeUtilizzato;
     }
 }

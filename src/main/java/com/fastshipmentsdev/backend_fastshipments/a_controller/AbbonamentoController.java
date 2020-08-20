@@ -48,34 +48,4 @@ public class AbbonamentoController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
         }
     }
-
-    //MANCANO le liste di abbonamenti sottoscritti dal cliente,
-    //le liste di abbonamenti magazzino sottoscritti dal cliente,
-    //le liste di spedizioni effettuate dal cliente,
-
-
-//
-//    @PostMapping(value = "/aggiungi")
-//    public ResponseEntity aggiungiAbbonamento (@RequestBody Abbonamento a){
-//        return new ResponseEntity(abbonamentoService.aggiungiAbbonamento(a), HttpStatus.OK);
-//    }
-//
-//    @PutMapping(value = "/modifica/{idAbbonamento}")
-//    public ResponseEntity modifica(@PathVariable int idAbbonamento, @RequestBody Abbonamento a){
-//        try {
-//            return new ResponseEntity(abbonamentoService.modifica(idAbbonamento, a), HttpStatus.ACCEPTED);
-//        } catch (AbbonamentoNonEsistenteException e) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non esiste", e);
-//        }
-//    }
-//
-//    @PutMapping(value = "/elimina/{idAbbonamento}")
-//    public ResponseEntity elimina (@PathVariable int idAbbonamento){
-//        try {
-//            abbonamentoService.elimina(idAbbonamento);
-//            return new ResponseEntity(HttpStatus.ACCEPTED);
-//        } catch (AbbonamentoNonEsistenteException e) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non esiste", e);
-//        }
-//    }
 }
