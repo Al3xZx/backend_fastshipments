@@ -7,8 +7,8 @@ public class Indirizzo {
     private String regione;
     private String citta;
     private String provincia;
-    private String nomeDestinatario;
-    private String cognomeDestinatario;
+    private String nome;
+    private String cognome;
     private String via;
     private String civico;
 
@@ -18,12 +18,12 @@ public class Indirizzo {
     public Indirizzo(String regione,
                      String citta,
                      String provincia,
-                     String nomeDestinatario, String cognomeDestinatario, String via, String civico) {
+                     String nome, String cognome, String via, String civico) {
         this.regione = regione;
         this.citta = citta;
         this.provincia = provincia;
-        this.nomeDestinatario = nomeDestinatario;
-        this.cognomeDestinatario = cognomeDestinatario;
+        this.nome = nome;
+        this.cognome = cognome;
         this.via = via;
         this.civico = civico;
     }
@@ -52,20 +52,20 @@ public class Indirizzo {
         this.provincia = provincia;
     }
 
-    public String getNomeDestinatario() {
-        return nomeDestinatario;
+    public String getNome() {
+        return nome;
     }
 
-    public void setNomeDestinatario(String nomeDestinatario) {
-        this.nomeDestinatario = nomeDestinatario;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    public String getCognomeDestinatario() {
-        return cognomeDestinatario;
+    public String getCognome() {
+        return cognome;
     }
 
-    public void setCognomeDestinatario(String cognomeDestinatario) {
-        this.cognomeDestinatario = cognomeDestinatario;
+    public void setCognome(String cognome) {
+        this.cognome = cognome;
     }
 
     public String getVia() {
@@ -89,8 +89,8 @@ public class Indirizzo {
         return  "regione: " + regione +
                 " citta: " + citta  +
                 " provincia: " + provincia +
-                " nomeDestinatario: " + nomeDestinatario +
-                " cognomeDestinatario: " + cognomeDestinatario +
+                " nome: " + nome +
+                " cognome: " + cognome +
                 " via: " + via +
                 " civico: " + civico;
     }
@@ -107,9 +107,9 @@ public class Indirizzo {
         st.nextToken();
         ret.setProvincia(st.nextToken());
         st.nextToken();
-        ret.setNomeDestinatario(st.nextToken());
+        ret.setNome(st.nextToken());
         st.nextToken();
-        ret.setCognomeDestinatario(st.nextToken());
+        ret.setCognome(st.nextToken());
         st.nextToken();
         ret.setVia(st.nextToken());
         st.nextToken();

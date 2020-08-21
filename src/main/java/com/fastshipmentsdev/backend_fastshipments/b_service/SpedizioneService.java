@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class SpedizioneService {
@@ -59,7 +60,8 @@ public class SpedizioneService {
         s.setHubDestinazione(hubPartenza);
         //assegno il ritiro ai trasportatori urbani
         for(Dipendente d : hubPartenza.getDipendenti()){
-            if(d.getMansione().equals(MansioneDipendente.TRASPORTATORE_URBANO))
+            if(d.getMansione().equals(MansioneDipendente.TRASPORTATORE_URBANO) &&
+                    d.getAreaDiCompetenza().getProvincia().equals(Indirizzo.parse(cliente.getIndirizzo()).getProvincia()))
                 d.getSpedizioniDaRitirare().add(s);
         }
         s.setStato(StatoSpedizione.DA_RITIRARE);
@@ -135,14 +137,17 @@ public class SpedizioneService {
     }
 
     @Transactional(readOnly = false)
-    public void spedizioneDaMagazzino(Integer idAbbonamentoMagazzino, Integer idC, List<Integer> idMerce, Indirizzo indirizzo)
-            throws AbbonamentoNonEsistenteException, ClienteNonEsistenteException, MerceNonEsistenteException, MerceNonAssociataException {
+    public void spedizioneDaMagazzino(Integer idAbbonamentoMagazzino, Integer idC, List<Integer> idMerce, Indirizzo indirizzoDiDestinazione)
+            throws AbbonamentoNonEsistenteException, ClienteNonEsistenteException, MerceNonEsistenteException, MerceNonAssociataException, AbbonamentoNonAssociatoException {
         Optional<AbbonamentoMagazzinoSottoscritto> abbonamento = abbonamentoMagazzinoSottoscrittoRepository.findById(idAbbonamentoMagazzino);
         if(!abbonamento.isPresent())
             throw new AbbonamentoNonEsistenteException();
         Optional<Cliente> cliente = clienteRepository.findById(idC);
         if(!cliente.isPresent())
             throw new ClienteNonEsistenteException();
+
+        if(!cliente.get().getAbbonamentiMagazzino().contains(abbonamento.get()))
+            throw new AbbonamentoNonAssociatoException();
 
         Spedizione s = new Spedizione();
         s.setPesoTassabile(0.0);
@@ -159,7 +164,7 @@ public class SpedizioneService {
         s.setStato(StatoSpedizione.IN_LAVORAZIONE);
         s.setMittente(cliente.get());
 
-        Hub hubDestinazione = hubRepository.findByRegioneContaining(indirizzo.getRegione());
+        Hub hubDestinazione = hubRepository.findByRegioneContaining(indirizzoDiDestinazione.getRegione());
         Hub hubPartenza = abbonamento.get().getHub();
         s.setHubDestinazione(hubDestinazione);
         s.setHubDestinazione(hubPartenza);
@@ -173,6 +178,13 @@ public class SpedizioneService {
         if(!spedizione.isPresent())
             throw new SpedizioneNonEsistenteException();
         spedizione.get().setDataArrivo(d);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Spedizione> spedizioniEffettuate(int idCliente) throws ClienteNonEsistenteException {
+        Optional<Cliente> oC = clienteRepository.findById(idCliente);
+        if(!oC.isPresent()) throw new ClienteNonEsistenteException();
+        return spedizioneRepository.findAllByMittente(oC.get());
     }
 
 }
