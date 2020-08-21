@@ -26,7 +26,7 @@ public class Cliente {
     @Column(nullable = false, length = 20)
     private String telefono;
 
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false)
     private String indirizzo;
 
     @Transient

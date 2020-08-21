@@ -51,10 +51,11 @@ public class SpedizioneService {
         Cliente cliente = c.get();
         s.setMittente(cliente);
         s.setPesoTassabile(s.getVolume()*300);
+        s.setIndirizzoDestinatario(s.getIndirizzo().toString());
         Fattura f = generaFattura(cliente, cartaCredito, s);
         s.setFattura(f);
 
-        Hub hubDestinazione = hubRepository.findByRegioneContaining(Indirizzo.parse(s.getIndirizzoDestinatario()).getRegione());
+        Hub hubDestinazione = hubRepository.findByRegioneContaining(s.getIndirizzo().getRegione());
         Hub hubPartenza = hubRepository.findByRegioneContaining(Indirizzo.parse(cliente.getIndirizzo()).getRegione());
         s.setHubDestinazione(hubDestinazione);
         s.setHubDestinazione(hubPartenza);

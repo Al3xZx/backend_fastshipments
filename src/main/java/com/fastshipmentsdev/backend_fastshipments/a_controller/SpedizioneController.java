@@ -24,7 +24,7 @@ public class SpedizioneController {
     @Autowired
     SpedizioneService spedizioneService;
 
-    @PostMapping(value = "/aggiungi_spedizione/{idCliente}")
+    @PostMapping(value = "/aggiungi_spedizione/{idCliente}") //Todo da verificare
     public ResponseEntity aggiungi(@PathVariable int idCliente, @RequestBody Object[] spedAndCartaCredito){
         try {
 
@@ -68,7 +68,7 @@ public class SpedizioneController {
         }
     }
 
-    @PostMapping(value="/spedizioneDaMagazzino/{idAbbonamentoMagazzino}/{idC}")
+    @PostMapping(value="/spedizioneDaMagazzino/{idAbbonamentoMagazzino}/{idC}")     //todo da verifiare
     public void spedizioneDaMagazzino(@PathVariable Integer idAbbonamentoMagazzino,@PathVariable Integer idC,@RequestBody List<Object> indirizzoDestAndMerci){
         try{
             Indirizzo indirizzoDestinazione = (Indirizzo) indirizzoDestAndMerci.get(0);
@@ -91,7 +91,7 @@ public class SpedizioneController {
         }
     }
 
-    @PutMapping(value= "/posticipaConsegna/{idSpedizione}")
+    @PutMapping(value= "/posticipaConsegna/{idSpedizione}")//todo da controllare
     public void posticipaConsegna (@PathVariable Integer idSpedizione,@RequestBody LocalDateTime d){
         try{
             spedizioneService.posticipaConsegna(idSpedizione,d);

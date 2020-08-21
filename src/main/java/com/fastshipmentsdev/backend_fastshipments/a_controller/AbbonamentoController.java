@@ -21,7 +21,7 @@ public class AbbonamentoController {
     AbbonamentoService abbonamentoService;
 
     @GetMapping(value = "/all_abbonamenti/{resForPage}/{page}")
-    public ResponseEntity allAbbonamenti(int resForPage, int page){
+    public ResponseEntity allAbbonamenti(@PathVariable int resForPage, @PathVariable int page){
         return new ResponseEntity(abbonamentoService.allAbbonamenti(resForPage,page), HttpStatus.OK);
     }
 
