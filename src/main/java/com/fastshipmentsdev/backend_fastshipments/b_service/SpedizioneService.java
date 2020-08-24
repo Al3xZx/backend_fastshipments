@@ -4,6 +4,7 @@ import com.fastshipmentsdev.backend_fastshipments.c_repository.*;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.*;
 import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
 import com.fastshipmentsdev.backend_fastshipments.support.classi.MansioneDipendente;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.StatoMerce;
 import com.fastshipmentsdev.backend_fastshipments.support.classi.StatoSpedizione;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class SpedizioneService {
@@ -45,20 +45,24 @@ public class SpedizioneService {
     @Transactional(readOnly = false)
     public Spedizione aggiungi(int idCliente, Spedizione s, CartaCredito cartaCredito)
             throws ClienteNonEsistenteException, PagamentoException {
-
-        Optional<Cliente> c = clienteRepository.findById(s.getMittente().getIdCliente());
+        Optional<Cliente> c = clienteRepository.findById(idCliente);
         if(!c.isPresent()) throw new ClienteNonEsistenteException();
         Cliente cliente = c.get();
         s.setMittente(cliente);
         s.setPesoTassabile(s.getVolume()*300);
-        s.setIndirizzoDestinatario(s.getIndirizzo().toString());
+        s.getIndirizzoDestinazione().setProvincia(s.getIndirizzoDestinazione().getProvincia().toUpperCase());
+
         Fattura f = generaFattura(cliente, cartaCredito, s);
         s.setFattura(f);
+        String regTMP = s.getIndirizzoDestinazione().getRegione();
+        String regioneDest = Character.toString(regTMP.charAt(0)).toUpperCase()+regTMP.substring(1).toLowerCase();
+        s.getIndirizzoDestinazione().setRegione(regioneDest);
 
-        Hub hubDestinazione = hubRepository.findByRegioneContaining(s.getIndirizzo().getRegione());
+        Hub hubDestinazione = hubRepository.findByRegioneContaining(regioneDest);
         Hub hubPartenza = hubRepository.findByRegioneContaining(Indirizzo.parse(cliente.getIndirizzo()).getRegione());
         s.setHubDestinazione(hubDestinazione);
-        s.setHubDestinazione(hubPartenza);
+        s.setHubPartenza(hubPartenza);
+        s.setIndirizzoDestinatario(s.getIndirizzoDestinazione().toString());
         //assegno il ritiro ai trasportatori urbani
         for(Dipendente d : hubPartenza.getDipendenti()){
             if(d.getMansione().equals(MansioneDipendente.TRASPORTATORE_URBANO) &&
@@ -100,46 +104,57 @@ public class SpedizioneService {
     }
 
     @Transactional(readOnly = false)
-    public Spedizione spedizioneDaAbbonamento(Integer idAbbonamento, Integer idC, Spedizione s)
+    public Spedizione spedizioneDaAbbonamento(Integer idAbbonamentoSottoscritto, Integer idC, Spedizione s)
             throws ClienteNonEsistenteException, AbbonamentoNonEsistenteException,
-            AbbonamentoNonAssociatoException, SpedizioniTerminateException{
+            AbbonamentoNonAssociatoException, SpedizioniTerminateException, AbbonamentoScadutoException{
 
         Optional<Cliente> oC = clienteRepository.findById(idC);
         if(!oC.isPresent()) throw new ClienteNonEsistenteException();
         Cliente cliente = oC.get();
 
-        Optional<AbbonamentoSottoscritto> oA = abbonamentoSottoscrittoRepository.findById(idAbbonamento);
+        Optional<AbbonamentoSottoscritto> oA = abbonamentoSottoscrittoRepository.findById(idAbbonamentoSottoscritto);
         if(!oA.isPresent()) throw new AbbonamentoNonEsistenteException();
         AbbonamentoSottoscritto AS = oA.get();
 
-        if(!cliente.getAbbonamenti().contains(AS))
+        if(!AS.getCliente().getIdCliente().equals(idC))
             throw new AbbonamentoNonAssociatoException();
 
         if(AS.getAbbonamento().getNumeroSpedizioni().compareTo(AS.getSpedizioniEffettuate()+1)<0)
             throw new SpedizioniTerminateException();
+
+        if(AS.getDataFine().compareTo(LocalDateTime.now())<0)
+            throw new AbbonamentoScadutoException();
 
         AS.setSpedizioniEffettuate(AS.getSpedizioniEffettuate()+1);//incremento le spedizioni effettuate
 
         s.setMittente(cliente);
         s.setPesoTassabile(s.getVolume()*300);
         s.setStato(StatoSpedizione.DA_RITIRARE);
+        s.getIndirizzoDestinazione().setProvincia(s.getIndirizzoDestinazione().getProvincia().toUpperCase());
 
-        Hub hubDestinazione = hubRepository.findByRegioneContaining(Indirizzo.parse(s.getIndirizzoDestinatario()).getRegione());
+        String regTMP = s.getIndirizzoDestinazione().getRegione();
+        String regioneDest = Character.toString(regTMP.charAt(0)).toUpperCase()+regTMP.substring(1).toLowerCase();
+        s.getIndirizzoDestinazione().setRegione(regioneDest);
+
+        Hub hubDestinazione = hubRepository.findByRegioneContaining(regioneDest);
         Hub hubPartenza = hubRepository.findByRegioneContaining(Indirizzo.parse(cliente.getIndirizzo()).getRegione());
         s.setHubDestinazione(hubDestinazione);
-        s.setHubDestinazione(hubPartenza);
+        s.setHubPartenza(hubPartenza);
+        s.setIndirizzoDestinatario(s.getIndirizzoDestinazione().toString());
         //assegno il ritiro ai trasportatori urbani
         for(Dipendente d : hubPartenza.getDipendenti()){
-            if(d.getMansione().equals(MansioneDipendente.TRASPORTATORE_URBANO))
+            if(d.getMansione().equals(MansioneDipendente.TRASPORTATORE_URBANO)  &&
+                    d.getAreaDiCompetenza().getProvincia().equals(Indirizzo.parse(cliente.getIndirizzo()).getProvincia()))
                 d.getSpedizioniDaRitirare().add(s);
         }
 
         return spedizioneRepository.save(s);
     }
 
+
     @Transactional(readOnly = false)
-    public void spedizioneDaMagazzino(Integer idAbbonamentoMagazzino, Integer idC, List<Integer> idMerce, Indirizzo indirizzoDiDestinazione)
-            throws AbbonamentoNonEsistenteException, ClienteNonEsistenteException, MerceNonEsistenteException, MerceNonAssociataException, AbbonamentoNonAssociatoException {
+    public Spedizione spedizioneDaMagazzino(Integer idAbbonamentoMagazzino, Integer idC, List<Integer> idMerce, Indirizzo indirizzoDiDestinazione)
+            throws AbbonamentoNonEsistenteException, ClienteNonEsistenteException, MerceNonEsistenteException, MerceNonAssociataException, AbbonamentoNonAssociatoException, MerceNonStoccataException {
         Optional<AbbonamentoMagazzinoSottoscritto> abbonamento = abbonamentoMagazzinoSottoscrittoRepository.findById(idAbbonamentoMagazzino);
         if(!abbonamento.isPresent())
             throw new AbbonamentoNonEsistenteException();
@@ -152,33 +167,50 @@ public class SpedizioneService {
 
         Spedizione s = new Spedizione();
         s.setPesoTassabile(0.0);
+        s.setVolume(0.0);
         for(Integer i : idMerce){
             Optional<Merce> tmp = merceRepository.findById(i);
+
             if(!tmp.isPresent() )
                 throw new MerceNonEsistenteException();
-            if(!(cliente.get().getMerceProprietario().contains(merceRepository.findById(i))))
+            Merce m = tmp.get();
+            if(!m.getStato().equals(StatoMerce.STOCCATA))
+                throw new MerceNonStoccataException();
+            if(!(cliente.get().getMerceProprietario().contains(m)))
                 throw new MerceNonAssociataException();
-            s.getMerci().add(tmp.get());
-            tmp.get().setSpedizione(s);
+
+            //todo gestione merce da eliminare dalla base di dati (forse va fatto dopo che è spedito oppure aggiungere lo stato "NON_DISPONIBILE" alla merce
+            s.getMerci().add(m);
+            m.setSpedizione(s);
             s.setPesoTassabile(s.getPesoTassabile()+(tmp.get().getVolume()*300));
+            s.setVolume(s.getVolume()+m.getVolume());
         }
         s.setStato(StatoSpedizione.IN_LAVORAZIONE);
         s.setMittente(cliente.get());
 
-        Hub hubDestinazione = hubRepository.findByRegioneContaining(indirizzoDiDestinazione.getRegione());
+        s.getIndirizzoDestinazione().setProvincia(s.getIndirizzoDestinazione().getProvincia().toUpperCase());
+
+        String regTMP = s.getIndirizzoDestinazione().getRegione();
+        String regioneDest = Character.toString(regTMP.charAt(0)).toUpperCase()+regTMP.substring(1).toLowerCase();
+        s.getIndirizzoDestinazione().setRegione(regioneDest);
+
+        Hub hubDestinazione = hubRepository.findByRegioneContaining(regioneDest);
         Hub hubPartenza = abbonamento.get().getHub();
         s.setHubDestinazione(hubDestinazione);
         s.setHubDestinazione(hubPartenza);
 
-        spedizioneRepository.save(s);
+        return spedizioneRepository.save(s);
     }
 
     @Transactional(readOnly = false)
-    public void posticipaConsegna (Integer idSpedizione, LocalDateTime d) throws SpedizioneNonEsistenteException {
+    public void posticipaConsegna (Integer idSpedizione, LocalDateTime d) throws SpedizioneNonEsistenteException, DateException {
         Optional<Spedizione> spedizione = spedizioneRepository.findById(idSpedizione);
         if(!spedizione.isPresent())
             throw new SpedizioneNonEsistenteException();
-        spedizione.get().setDataArrivo(d);
+        Spedizione s = spedizione.get();
+        if(d.compareTo(s.getDataArrivo())<0)
+            throw new DateException();
+        s.setDataArrivo(d);
     }
 
     @Transactional(readOnly = true)

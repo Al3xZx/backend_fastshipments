@@ -53,7 +53,7 @@ public class AbbonamentoMagazzinoController {
         }
     }
 
-    @PostMapping(value = "/richiesta_ritiro/{idCliente}/{idAbbonamento}/{numeroMerci}")
+    @PostMapping(value = "/richiesta_ritiro/{idCliente}/{idAbbonamentoMagazzinoSottoscritto}/{numeroMerci}")
     public ResponseEntity richiestaRitiroMerce(@PathVariable int idCliente, @PathVariable int idAbbonamentoMagazzinoSottoscritto, @RequestBody Merce merce, @PathVariable int numeroMerci){
         try {
             return new ResponseEntity(abbonamentoMagazzinoService.richiestaRitiroMerce(idCliente, idAbbonamentoMagazzinoSottoscritto, merce, numeroMerci), HttpStatus.OK);
@@ -68,10 +68,23 @@ public class AbbonamentoMagazzinoController {
         }
     }
 
-    @GetMapping(value = "/ricerca_merce/{idCliente}/{idAbbonamento}/{descrizione}")
-    public ResponseEntity ricercaMerceDescr(int idCliente, int idAbbonamento, String descrizione){
+    @GetMapping(value = "/ricerca_merce/{idCliente}/{descrizione}")
+    public ResponseEntity ricercaMerceDescr(@PathVariable int idCliente/*, @PathVariable int idAbbonamento*/, @PathVariable String descrizione){
         try {
-            return new ResponseEntity(abbonamentoMagazzinoService.ricercaMerceDescr(idCliente, idAbbonamento, descrizione), HttpStatus.OK);
+            return new ResponseEntity(abbonamentoMagazzinoService.ricercaMerceDescr(idCliente/*, idAbbonamento*/, descrizione), HttpStatus.OK);
+        } catch (ClienteNonEsistenteException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
+        } catch (AbbonamentoNonEsistenteException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non esiste", e);
+        } catch (AbbonamentoNonAssociatoException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non è associato al cliente", e);
+        }
+    }
+
+    @GetMapping(value = "/merce_in_magazzino/{idCliente}/{idAbbonamento}")
+    public ResponseEntity merceInMagazzino(@PathVariable int idCliente, @PathVariable int idAbbonamento){//todo test....
+        try {
+            return new ResponseEntity(abbonamentoMagazzinoService.merceInMagazzino(idCliente, idAbbonamento), HttpStatus.OK);
         } catch (ClienteNonEsistenteException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
         } catch (AbbonamentoNonEsistenteException e) {

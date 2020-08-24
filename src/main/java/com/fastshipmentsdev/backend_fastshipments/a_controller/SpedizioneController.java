@@ -5,6 +5,7 @@ import com.fastshipmentsdev.backend_fastshipments.d_entity.CartaCredito;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.Merce;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.Spedizione;
 import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.SpedizioCartaWrap;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,14 +25,13 @@ public class SpedizioneController {
     @Autowired
     SpedizioneService spedizioneService;
 
-    @PostMapping(value = "/aggiungi_spedizione/{idCliente}") //Todo da verificare
-    public ResponseEntity aggiungi(@PathVariable int idCliente, @RequestBody Object[] spedAndCartaCredito){
+    @PostMapping(value = "/aggiungi_spedizione/{idCliente}") //Todo da verificare (ok)
+    public ResponseEntity aggiungi(@PathVariable int idCliente, @RequestBody SpedizioCartaWrap SCW){
         try {
-
-            Spedizione s = (Spedizione)spedAndCartaCredito[0];
-            CartaCredito cartaCredito = (CartaCredito) spedAndCartaCredito[1];
-            Spedizione spedizione = spedizioneService.aggiungi(idCliente, s, cartaCredito);
-            return new ResponseEntity(spedizione, HttpStatus.CREATED);
+            Spedizione spedizione = SCW.getSpedizione();
+            CartaCredito cartaCredito = SCW.getCartaCredito();
+            Spedizione spedizioneRet = spedizioneService.aggiungi(idCliente, spedizione, cartaCredito);
+            return new ResponseEntity(spedizioneRet, HttpStatus.CREATED);
         }catch(ClienteNonEsistenteException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
         } catch (PagamentoException e) {
@@ -52,10 +52,10 @@ public class SpedizioneController {
     }
 
 
-    @GetMapping(value="/spedizioneDaAbbonamento/{idAbbonamento}/{idC}")
-    public void spedizioneDaAbbonamento(@PathVariable Integer idAbbonamento,@PathVariable Integer idC,@RequestBody Spedizione s){
+    @PostMapping(value="/spedizioneDaAbbonamento/{idAbbonamento}/{idC}")
+    public ResponseEntity spedizioneDaAbbonamento(@PathVariable int idAbbonamento,@PathVariable int idC,@RequestBody Spedizione s){
         try{
-            spedizioneService.spedizioneDaAbbonamento(idAbbonamento,idC,s);
+            return new ResponseEntity(spedizioneService.spedizioneDaAbbonamento(idAbbonamento,idC,s), HttpStatus.OK);
         } catch(ClienteNonEsistenteException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
         }catch(AbbonamentoNonEsistenteException e ){
@@ -65,11 +65,13 @@ public class SpedizioneController {
         } catch (SpedizioniTerminateException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le spedizioni a sua disposizione per " +
                     "questo abbonamento sono terminate", e);
+        } catch (AbbonamentoScadutoException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento' è scaduto", e);
         }
     }
 
     @PostMapping(value="/spedizioneDaMagazzino/{idAbbonamentoMagazzino}/{idC}")     //todo da verifiare
-    public void spedizioneDaMagazzino(@PathVariable Integer idAbbonamentoMagazzino,@PathVariable Integer idC,@RequestBody List<Object> indirizzoDestAndMerci){
+    public void spedizioneDaMagazzino(@PathVariable Integer idAbbonamentoMagazzino, @PathVariable Integer idC,@RequestBody List<Object> indirizzoDestAndMerci){
         try{
             Indirizzo indirizzoDestinazione = (Indirizzo) indirizzoDestAndMerci.get(0);
             List<Integer> idMerci = new LinkedList<>();
@@ -97,6 +99,8 @@ public class SpedizioneController {
             spedizioneService.posticipaConsegna(idSpedizione,d);
         }catch(SpedizioneNonEsistenteException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La spedizione non esiste", e);
+        } catch (DateException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La data è inferiore della data di consegna", e);
         }
     }
 

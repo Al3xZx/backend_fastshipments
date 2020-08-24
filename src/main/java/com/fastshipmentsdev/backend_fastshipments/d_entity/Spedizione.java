@@ -2,7 +2,6 @@ package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
-import org.w3c.dom.ls.LSProgressEvent;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,7 +12,7 @@ import java.util.TreeSet;
 
 /**
  * un’entità spedizione identificata da idSpedizione e caratterizzata da hub di partenza, lista
- * delle merci, data di partenza, data di arrivo, dal cliente mittente, indirizzo del destinatario,
+ * delle merci, data di partenza, data di arrivo, dal cliente mittente, indirizzoDestinazione del destinatario,
  * hub di destinazione, una lista di hub per i quali passa, la lista di trasportatori extraurbani che
  * la trasportano, il trasportatore urbano che la ritira, il trasportatore urbano che la consegna,
  * volume complessivo e peso tassabile (= volume complessivo *300)
@@ -54,7 +53,7 @@ public class Spedizione {
 
     @Transient
     @JsonInclude
-    private Indirizzo indirizzo;
+    private Indirizzo indirizzoDestinazione;
 
     private String stato;
 
@@ -219,12 +218,12 @@ public class Spedizione {
         this.fattura = fattura;
     }
 
-    public Indirizzo getIndirizzo() {
-        return indirizzo;
+    public Indirizzo getIndirizzoDestinazione() {
+        return indirizzoDestinazione;
     }
 
-    public void setIndirizzo(Indirizzo indirizzo) {
-        this.indirizzo = indirizzo;
+    public void setIndirizzoDestinazione(Indirizzo indirizzoDestinazione) {
+        this.indirizzoDestinazione = indirizzoDestinazione;
     }
 
     public List<Merce> getMerci() {

@@ -24,6 +24,7 @@ public class Scaffale {
     private Hub hub;
 
     @OneToMany(mappedBy = "scaffale")
+    @JsonIgnore
     private List<Merce> merci = new LinkedList<>();
 
     public Integer getIdScaffale() {

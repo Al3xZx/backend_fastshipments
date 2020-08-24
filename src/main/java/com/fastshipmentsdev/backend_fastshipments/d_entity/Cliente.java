@@ -174,4 +174,24 @@ public class Cliente {
     public void setIndirizzoCliente(Indirizzo indirizzoCliente) {
         this.indirizzoCliente = indirizzoCliente;
     }
+
+    @Override
+    public String toString() {
+        return "Cliente{" +
+                "idCliente=" + idCliente +
+                ", telefono='" + telefono + '\'' +
+                ", indirizzo='" + indirizzo + '\'' +
+                ", indirizzoCliente=" + indirizzoCliente +
+                ", email='" + email + '\'' +
+                ", ragioneSociale='" + ragioneSociale + '\'' +
+                ", pIva=" + pIva +
+                ", nome='" + nome + '\'' +
+                ", cognome='" + cognome + '\'' +
+                ", cf='" + cf + '\'' +
+                ", abbonamenti=" + abbonamenti +
+                ", abbonamentiMagazzino=" + abbonamentiMagazzino +
+                ", fatture=" + fatture +
+                ", merceProprietario=" + merceProprietario +
+                '}';
+    }
 }

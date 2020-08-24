@@ -4,6 +4,7 @@ import com.fastshipmentsdev.backend_fastshipments.c_repository.AccountClienteRep
 import com.fastshipmentsdev.backend_fastshipments.c_repository.ClienteRepository;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.AccountCliente;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.Cliente;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.ClienteNonEsistenteException;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.ClienteNonRegistratoException;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.PasswordErrataException;
@@ -28,6 +29,11 @@ public class ClienteService {
         AccountCliente accountCliente = new AccountCliente();
         accountCliente.setUsername(c);
         accountCliente.setPassword(password);
+        Indirizzo indirizzo = c.getIndirizzoCliente();
+        String regTMP = indirizzo.getRegione();
+        String regione = Character.toString(regTMP.charAt(0)).toUpperCase()+regTMP.substring(1).toLowerCase();
+        indirizzo.setRegione(regione);
+        indirizzo.setProvincia(indirizzo.getProvincia().toUpperCase());
         c.setIndirizzo(c.getIndirizzoCliente().toString());
         clienteRepository.save(c);
         accountClienteRepository.save(accountCliente);

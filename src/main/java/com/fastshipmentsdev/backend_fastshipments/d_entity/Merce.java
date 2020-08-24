@@ -42,6 +42,20 @@ public class Merce {
     @JoinColumn(nullable = false)
     private Cliente proprietario;
 
+    public Merce() {
+    }
+
+    public Merce(Merce merce) {
+        this.volume = merce.volume;
+        this.descrizione = merce.descrizione;
+        this.indiceRotazione = merce.indiceRotazione;
+        this.indicePosizione = merce.indicePosizione;
+        this.scaffale = merce.scaffale;
+        this.stato = merce.stato;
+        this.spedizione = merce.spedizione;
+        this.proprietario = merce.proprietario;
+    }
+
     public Integer getIdMerce() {
         return idMerce;
     }
@@ -87,7 +101,7 @@ public class Merce {
     }
 
     public void setStato(String stato) {
-        stato = stato;
+        this.stato = stato;
     }
 
     public Spedizione getSpedizione() {
@@ -112,5 +126,20 @@ public class Merce {
 
     public void setDescrizione(String descrizione) {
         this.descrizione = descrizione;
+    }
+
+    @Override
+    public String toString() {
+        return "Merce{" +
+                "idMerce=" + idMerce +
+                ", volume=" + volume +
+                ", descrizione='" + descrizione + '\'' +
+                ", indiceRotazione=" + indiceRotazione +
+                ", indicePosizione=" + indicePosizione +
+                ", scaffale=" + scaffale +
+                ", stato='" + stato + '\'' +
+                ", spedizione=" + spedizione +
+                ", proprietario=" + proprietario +
+                '}';
     }
 }
