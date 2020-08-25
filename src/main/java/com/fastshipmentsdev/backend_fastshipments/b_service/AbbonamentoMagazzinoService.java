@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -102,18 +103,23 @@ public class AbbonamentoMagazzinoService {
 
     @Transactional(readOnly = false)
     public List<Merce> richiestaRitiroMerce(int idCliente, int idAbbonamentoMagazzinoSottoscritto, Merce merce, int numeroMerci)
-            throws ClienteNonEsistenteException, AbbonamentoNonEsistenteException, SpazioNonDisponibileException, AbbonamentoNonAssociatoException {
+            throws ClienteNonEsistenteException, AbbonamentoNonEsistenteException, SpazioNonDisponibileException, AbbonamentoNonAssociatoException, AbbonamentoScadutoException {
         Optional<Cliente> oC = clienteRepository.findById(idCliente);
         if(!oC.isPresent()) throw new ClienteNonEsistenteException();
         Cliente cliente = oC.get();
         Optional<AbbonamentoMagazzinoSottoscritto> oAMS = abbonamentoMagazzinoSottoscrittoRepository.findById(idAbbonamentoMagazzinoSottoscritto);
         if(!oAMS.isPresent()) throw new AbbonamentoNonEsistenteException();
         AbbonamentoMagazzinoSottoscritto AMS = oAMS.get();
+
+        if(AMS.getDataFine().compareTo(LocalDateTime.now())<0)
+            throw new AbbonamentoScadutoException();
+
         if(!AMS.getCliente().getIdCliente().equals(idCliente))
             throw new AbbonamentoNonAssociatoException();
         double volumeMerce = merce.getVolume();
         if(AMS.getAbbonamentoMagazzino().getVolumeDisponibile().compareTo(AMS.getVolumeUtilizzato()+(volumeMerce*numeroMerci))<0)
             throw new SpazioNonDisponibileException();
+
         AMS.setVolumeUtilizzato(AMS.getVolumeUtilizzato()+(volumeMerce*numeroMerci));
         merce.setProprietario(cliente);
         merce.setStato(StatoMerce.DA_RITIRARE);
@@ -127,17 +133,9 @@ public class AbbonamentoMagazzinoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Merce> ricercaMerceDescr(int idCliente/*, int idAbbonamentoMagazzinoSottoscritto*/, String descrizione)
-            throws ClienteNonEsistenteException, AbbonamentoNonEsistenteException, AbbonamentoNonAssociatoException {
+    public List<Merce> ricercaMerceDescr(int idCliente, String descrizione) throws ClienteNonEsistenteException{
         Optional<Cliente> oC = clienteRepository.findById(idCliente);
         if(!oC.isPresent()) throw new ClienteNonEsistenteException();
-//        Optional<AbbonamentoMagazzinoSottoscritto> oAMS = abbonamentoMagazzinoSottoscrittoRepository.findById(idAbbonamentoMagazzinoSottoscritto);
-//        if(!oAMS.isPresent()) throw new AbbonamentoNonEsistenteException();
-//        AbbonamentoMagazzinoSottoscritto AMS = oAMS.get();
-//        if(!AMS.getCliente().getIdCliente().equals(idCliente))
-//            throw new AbbonamentoNonAssociatoException();
-//        Hub hub = AMS.getHub();
-        //TODO verificare
         List<Merce> ret = new LinkedList<>();
         for (Merce m: oC.get().getMerceProprietario()) {
             if(m.getDescrizione().contains(descrizione))
