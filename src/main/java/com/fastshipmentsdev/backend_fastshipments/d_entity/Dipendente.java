@@ -50,6 +50,7 @@ public class Dipendente {
     private AreaDiCompetenza areaDiCompetenza;
 
     @OneToMany(mappedBy = "traspRitiro")
+    @JsonIgnore
     private List<Spedizione> spedizioniDaRitirare = new LinkedList<>();
 
     public Integer getIdDipendente() {

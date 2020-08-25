@@ -4,7 +4,9 @@ import com.fastshipmentsdev.backend_fastshipments.b_service.SpedizioneService;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.CartaCredito;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.Merce;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.Spedizione;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.DateTime;
 import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.IndirizzoIdMerci;
 import com.fastshipmentsdev.backend_fastshipments.support.classi.SpedizioCartaWrap;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 @RestController
@@ -70,16 +70,13 @@ public class SpedizioneController {
         }
     }
 
-    @PostMapping(value="/spedizioneDaMagazzino/{idAbbonamentoMagazzino}/{idC}")     //todo da verifiare
-    public void spedizioneDaMagazzino(@PathVariable Integer idAbbonamentoMagazzino, @PathVariable Integer idC,@RequestBody List<Object> indirizzoDestAndMerci){
+    @PostMapping(value="/spedizioneDaMagazzino/{idAbbonamentoMagazzino}/{idC}")//todo da verificare
+    public ResponseEntity spedizioneDaMagazzino(@PathVariable Integer idAbbonamentoMagazzino, @PathVariable Integer idC,@RequestBody IndirizzoIdMerci indirizzoDestAndMerci){
         try{
-            Indirizzo indirizzoDestinazione = (Indirizzo) indirizzoDestAndMerci.get(0);
-            List<Integer> idMerci = new LinkedList<>();
-            Iterator<Object> i = indirizzoDestAndMerci.iterator();
-            while (i.hasNext()){
-                idMerci.add((Integer)i.next());
-            }
-            spedizioneService.spedizioneDaMagazzino(idAbbonamentoMagazzino,idC, idMerci, indirizzoDestinazione);
+            Indirizzo indirizzoDestinazione = indirizzoDestAndMerci.getIndirizzo();
+            List<Integer> idMerci = indirizzoDestAndMerci.getIdMerci();
+            Spedizione s = spedizioneService.spedizioneDaMagazzino(idAbbonamentoMagazzino,idC, idMerci, indirizzoDestinazione);
+            return new ResponseEntity(s, HttpStatus.OK);
         }catch(MerceNonEsistenteException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La merce non esiste", e);
         }catch(ClienteNonEsistenteException e){
@@ -90,13 +87,19 @@ public class SpedizioneController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La merce non è  associata al cliente", e);
         } catch (AbbonamentoNonAssociatoException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento' non è associato al cliente", e);
+        } catch (MerceNonDisponibileException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La merce non è disponibile poichè già in lavorazione per un'altra spedizione", e);
+        } catch (MerceNonStoccataException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La merce non è  ancora disponibile per la lavorazione alla spedizione", e);
         }
     }
 
     @PutMapping(value= "/posticipaConsegna/{idSpedizione}")//todo da controllare
-    public void posticipaConsegna (@PathVariable Integer idSpedizione,@RequestBody LocalDateTime d){
+    public ResponseEntity posticipaConsegna (@PathVariable Integer idSpedizione,@RequestBody LocalDateTime d){
         try{
-            spedizioneService.posticipaConsegna(idSpedizione,d);
+            System.out.println(d);
+            Spedizione s = spedizioneService.posticipaConsegna(idSpedizione,d);
+            return new ResponseEntity(s, HttpStatus.OK);
         }catch(SpedizioneNonEsistenteException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La spedizione non esiste", e);
         } catch (DateException e) {

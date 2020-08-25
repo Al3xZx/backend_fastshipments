@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -154,7 +155,7 @@ public class SpedizioneService {
 
     @Transactional(readOnly = false)
     public Spedizione spedizioneDaMagazzino(Integer idAbbonamentoMagazzino, Integer idC, List<Integer> idMerce, Indirizzo indirizzoDiDestinazione)
-            throws AbbonamentoNonEsistenteException, ClienteNonEsistenteException, MerceNonEsistenteException, MerceNonAssociataException, AbbonamentoNonAssociatoException, MerceNonStoccataException {
+            throws AbbonamentoNonEsistenteException, ClienteNonEsistenteException, MerceNonEsistenteException, MerceNonAssociataException, AbbonamentoNonAssociatoException, MerceNonStoccataException, MerceNonDisponibileException {
         Optional<AbbonamentoMagazzinoSottoscritto> abbonamento = abbonamentoMagazzinoSottoscrittoRepository.findById(idAbbonamentoMagazzino);
         if(!abbonamento.isPresent())
             throw new AbbonamentoNonEsistenteException();
@@ -168,6 +169,7 @@ public class SpedizioneService {
         Spedizione s = new Spedizione();
         s.setPesoTassabile(0.0);
         s.setVolume(0.0);
+        List<Merce> merciTmp = new LinkedList<>();
         for(Integer i : idMerce){
             Optional<Merce> tmp = merceRepository.findById(i);
 
@@ -176,15 +178,19 @@ public class SpedizioneService {
             Merce m = tmp.get();
             if(!m.getStato().equals(StatoMerce.STOCCATA))
                 throw new MerceNonStoccataException();
+            if(m.getStato().equals(StatoMerce.IN_LAVORAZIONE))
+                throw new MerceNonDisponibileException();
             if(!(cliente.get().getMerceProprietario().contains(m)))
                 throw new MerceNonAssociataException();
-
-            //todo gestione merce da eliminare dalla base di dati (forse va fatto dopo che è spedito oppure aggiungere lo stato "NON_DISPONIBILE" alla merce
+            m.setStato(StatoMerce.IN_LAVORAZIONE);
             s.getMerci().add(m);
-            m.setSpedizione(s);
+            //m.setSpedizione(s);
+            merciTmp.add(m);
             s.setPesoTassabile(s.getPesoTassabile()+(tmp.get().getVolume()*300));
             s.setVolume(s.getVolume()+m.getVolume());
-        }
+        }//for
+
+        s.setIndirizzoDestinazione(indirizzoDiDestinazione);
         s.setStato(StatoSpedizione.IN_LAVORAZIONE);
         s.setMittente(cliente.get());
 
@@ -193,17 +199,22 @@ public class SpedizioneService {
         String regTMP = s.getIndirizzoDestinazione().getRegione();
         String regioneDest = Character.toString(regTMP.charAt(0)).toUpperCase()+regTMP.substring(1).toLowerCase();
         s.getIndirizzoDestinazione().setRegione(regioneDest);
+        s.setIndirizzoDestinatario(s.getIndirizzoDestinazione().toString());
 
         Hub hubDestinazione = hubRepository.findByRegioneContaining(regioneDest);
         Hub hubPartenza = abbonamento.get().getHub();
         s.setHubDestinazione(hubDestinazione);
-        s.setHubDestinazione(hubPartenza);
+        s.setHubPartenza(hubPartenza);
 
-        return spedizioneRepository.save(s);
+        Spedizione ret = spedizioneRepository.save(s);
+        for (Merce m : merciTmp)
+            m.setSpedizione(ret);
+        
+        return ret;
     }
 
     @Transactional(readOnly = false)
-    public void posticipaConsegna (Integer idSpedizione, LocalDateTime d) throws SpedizioneNonEsistenteException, DateException {
+    public Spedizione posticipaConsegna (Integer idSpedizione, LocalDateTime d) throws SpedizioneNonEsistenteException, DateException {
         Optional<Spedizione> spedizione = spedizioneRepository.findById(idSpedizione);
         if(!spedizione.isPresent())
             throw new SpedizioneNonEsistenteException();
@@ -211,6 +222,7 @@ public class SpedizioneService {
         if(d.compareTo(s.getDataArrivo())<0)
             throw new DateException();
         s.setDataArrivo(d);
+        return s;
     }
 
     @Transactional(readOnly = true)

@@ -95,10 +95,15 @@ public class AbbonamentoMagazzinoService {
     }
 
     @Transactional(readOnly = true)
-    public Set<AbbonamentoMagazzinoSottoscritto> abbonamentiMagazzinoSottoscritti(int idCliente) throws ClienteNonEsistenteException {
+    public List<AbbonamentoMagazzinoSottoscritto> abbonamentiMagazzinoSottoscritti(int idCliente) throws ClienteNonEsistenteException {
         Optional<Cliente> oC = clienteRepository.findById(idCliente);
         if(!oC.isPresent()) throw new ClienteNonEsistenteException();
-        return oC.get().getAbbonamentiMagazzino();
+        Cliente c = oC.get();
+        List<AbbonamentoMagazzinoSottoscritto> ret = new LinkedList<>();
+        for(AbbonamentoMagazzinoSottoscritto a : c.getAbbonamentiMagazzino())
+            if(a.getDataFine().compareTo(LocalDateTime.now())>0)
+                ret.add(a);
+        return ret;
     }
 
     @Transactional(readOnly = false)

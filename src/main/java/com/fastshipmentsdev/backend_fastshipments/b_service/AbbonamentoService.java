@@ -10,6 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -77,10 +79,15 @@ public class AbbonamentoService {
     }
 
     @Transactional(readOnly = true)
-    public Set<AbbonamentoSottoscritto> abbonamentiSottoscritti(int idCliente) throws ClienteNonEsistenteException {
+    public List<AbbonamentoSottoscritto> abbonamentiSottoscritti(int idCliente) throws ClienteNonEsistenteException {
         Optional<Cliente> oC = clienteRepository.findById(idCliente);
         if(!oC.isPresent()) throw new ClienteNonEsistenteException();
-        return oC.get().getAbbonamenti();
+        Cliente c = oC.get();
+        List<AbbonamentoSottoscritto> ret = new LinkedList<>();
+        for(AbbonamentoSottoscritto a : c.getAbbonamenti())
+            if(a.getDataFine().compareTo(LocalDateTime.now())>0)
+                ret.add(a);
+        return ret;
     }
 
 }

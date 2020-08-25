@@ -6,4 +6,5 @@ public class StatoMerce {
     public static final String DA_RICEVERE = "DA_RICEVERE";
     public static final String STOCCATA = "STOCCATA";
     public static final String NON_CONFERME = "NON_CONFERME";
+    public static final String IN_LAVORAZIONE = "IN_LAVORAZIONE";
 }

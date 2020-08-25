@@ -65,19 +65,17 @@ public class AbbonamentoMagazzinoController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Non c'è spazio a sufficienza con l'abbonamento sottoscritto", e);
         } catch (AbbonamentoNonAssociatoException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non è associato al cliente", e);
+        } catch (AbbonamentoScadutoException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento' è scaduto", e);
         }
     }
 
     @GetMapping(value = "/ricerca_merce/{idCliente}/{descrizione}")
-    public ResponseEntity ricercaMerceDescr(@PathVariable int idCliente/*, @PathVariable int idAbbonamento*/, @PathVariable String descrizione){
+    public ResponseEntity ricercaMerceDescr(@PathVariable int idCliente, @PathVariable String descrizione){
         try {
-            return new ResponseEntity(abbonamentoMagazzinoService.ricercaMerceDescr(idCliente/*, idAbbonamento*/, descrizione), HttpStatus.OK);
+            return new ResponseEntity(abbonamentoMagazzinoService.ricercaMerceDescr(idCliente, descrizione), HttpStatus.OK);
         } catch (ClienteNonEsistenteException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
-        } catch (AbbonamentoNonEsistenteException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non esiste", e);
-        } catch (AbbonamentoNonAssociatoException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non è associato al cliente", e);
         }
     }
 
