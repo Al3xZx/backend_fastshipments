@@ -1,6 +1,9 @@
 package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.IndirizzoHub;
 
 import javax.persistence.*;
 import java.util.LinkedList;
@@ -14,9 +17,19 @@ public class Hub {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer idHub;
 
-    private String nomeCitta;
+    @Column(nullable = false)
+    private String indirizzo;
 
-    private String regione;
+    @Column(nullable = false)
+    private String telefono;
+
+    @Transient
+    @JsonInclude
+    private IndirizzoHub indirizzoHub;
+
+//    private String nomeCitta;
+//
+//    private String regione;
 
     private Double volumeTotale;
 
@@ -50,21 +63,21 @@ public class Hub {
         this.idHub = idHub;
     }
 
-    public String getNomeCitta() {
-        return nomeCitta;
-    }
-
-    public void setNomeCitta(String nomeCitta) {
-        this.nomeCitta = nomeCitta;
-    }
-
-    public String getRegione() {
-        return regione;
-    }
-
-    public void setRegione(String regione) {
-        this.regione = regione;
-    }
+//    public String getNomeCitta() {
+//        return nomeCitta;
+//    }
+//
+//    public void setNomeCitta(String nomeCitta) {
+//        this.nomeCitta = nomeCitta;
+//    }
+//
+//    public String getRegione() {
+//        return regione;
+//    }
+//
+//    public void setRegione(String regione) {
+//        this.regione = regione;
+//    }
 
     public Double getVolumeTotale() {
         return volumeTotale;
@@ -120,5 +133,29 @@ public class Hub {
 
     public void setSpedizioniPassaggio(List<Spedizione> spedizioniPassaggio) {
         this.spedizioniPassaggio = spedizioniPassaggio;
+    }
+
+    public String getIndirizzo() {
+        return indirizzo;
+    }
+
+    public void setIndirizzo(String indirizzo) {
+        this.indirizzo = indirizzo;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public IndirizzoHub getIndirizzoHub() {
+        return indirizzoHub;
+    }
+
+    public void setIndirizzoHub(IndirizzoHub indirizzoHub) {
+        this.indirizzoHub = indirizzoHub;
     }
 }

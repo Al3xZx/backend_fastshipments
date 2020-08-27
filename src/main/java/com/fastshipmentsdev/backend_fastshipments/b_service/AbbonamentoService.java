@@ -2,9 +2,12 @@ package com.fastshipmentsdev.backend_fastshipments.b_service;
 
 import com.fastshipmentsdev.backend_fastshipments.c_repository.*;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.*;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.IndirizzoHub;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.AbbonamentoNonEsistenteException;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.ClienteNonEsistenteException;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.PagamentoException;
+import com.fastshipmentsdev.backend_fastshipments.support.exception.ServizioInZonaNonDisponibileException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -34,6 +37,9 @@ public class AbbonamentoService {
     @Autowired
     CartaCreditoRepository cartaCreditoRepository;
 
+    @Autowired
+    HubRepository hubRepository;
+
 
     @Transactional(readOnly = true)
     public List<Abbonamento> allAbbonamenti(int resForPage, int page){
@@ -42,12 +48,23 @@ public class AbbonamentoService {
 
     @Transactional(readOnly = false)
     public AbbonamentoSottoscritto sottoscriviAbbonamento(int idC, int idA, CartaCredito cartaCredito)
-            throws ClienteNonEsistenteException, AbbonamentoNonEsistenteException, PagamentoException {
+            throws ClienteNonEsistenteException, AbbonamentoNonEsistenteException, PagamentoException, ServizioInZonaNonDisponibileException {
         Optional<Cliente> oC = clienteRepository.findById(idC);
         if(!oC.isPresent()) throw new ClienteNonEsistenteException();
         Optional<Abbonamento> oA = abbonamentoRepository.findById(idA);
         if(!oA.isPresent()) throw new AbbonamentoNonEsistenteException();
         AbbonamentoSottoscritto aS = new AbbonamentoSottoscritto();
+
+        String regioneCliente = Indirizzo.parse(oC.get().getIndirizzo()).getRegione();
+        List<Hub> hubs = hubRepository.selAllHub();
+        Hub posibileHubServizio = null;
+        for(Hub h : hubs){
+            IndirizzoHub ih = IndirizzoHub.parse(h.getIndirizzo());
+            if(ih.getRegione().toUpperCase().equals(regioneCliente.toUpperCase()))
+                posibileHubServizio = h;
+        }
+        if(posibileHubServizio == null)
+            throw new ServizioInZonaNonDisponibileException();
         aS.setCliente(oC.get());
         aS.setAbbonamento(oA.get());
         aS.setDataFine(aS.getDataInizio().plusDays(oA.get().getDurata()));

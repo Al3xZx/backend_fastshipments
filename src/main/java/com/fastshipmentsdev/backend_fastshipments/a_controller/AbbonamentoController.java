@@ -7,6 +7,7 @@ import com.fastshipmentsdev.backend_fastshipments.d_entity.CartaCredito;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.AbbonamentoNonEsistenteException;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.ClienteNonEsistenteException;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.PagamentoException;
+import com.fastshipmentsdev.backend_fastshipments.support.exception.ServizioInZonaNonDisponibileException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class AbbonamentoController {
         return new ResponseEntity(abbonamentoService.allAbbonamenti(resForPage,page), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/sottoscrivi/{idCliente}/{idAbbonamento}")
+    @PostMapping(value = "/sottoscrivi/{idCliente}/{idAbbonamento}") //Todo da verificare
     public ResponseEntity sottoscriviAbbonamento(
             @PathVariable int idCliente, @PathVariable int idAbbonamento, @RequestBody CartaCredito cartaCredito){
         try {
@@ -37,6 +38,9 @@ public class AbbonamentoController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non esiste", e);
         } catch (PagamentoException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "errore nel pagamento", e);
+        } catch (ServizioInZonaNonDisponibileException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "il servizio da lei scelto non " +
+                    "è erogato nella regione in cui risiede", e);
         }
     }
 

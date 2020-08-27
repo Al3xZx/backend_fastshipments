@@ -25,7 +25,7 @@ public class SpedizioneController {
     @Autowired
     SpedizioneService spedizioneService;
 
-    @PostMapping(value = "/aggiungi_spedizione/{idCliente}") //Todo da verificare (ok)
+    @PostMapping(value = "/aggiungi_spedizione/{idCliente}") //Todo da verificare
     public ResponseEntity aggiungi(@PathVariable int idCliente, @RequestBody SpedizioCartaWrap SCW){
         try {
             Spedizione spedizione = SCW.getSpedizione();
@@ -36,6 +36,8 @@ public class SpedizioneController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
         } catch (PagamentoException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Errore nel pagamento", e);
+        } catch (ServizioInZonaNonDisponibileException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il servizio non è erogato nella regione scelta", e);
         }
     }
 
@@ -52,7 +54,7 @@ public class SpedizioneController {
     }
 
 
-    @PostMapping(value="/spedizioneDaAbbonamento/{idAbbonamento}/{idC}")
+    @PostMapping(value="/spedizioneDaAbbonamento/{idAbbonamento}/{idC}") //todo test
     public ResponseEntity spedizioneDaAbbonamento(@PathVariable int idAbbonamento,@PathVariable int idC,@RequestBody Spedizione s){
         try{
             return new ResponseEntity(spedizioneService.spedizioneDaAbbonamento(idAbbonamento,idC,s), HttpStatus.OK);
@@ -67,10 +69,12 @@ public class SpedizioneController {
                     "questo abbonamento sono terminate", e);
         } catch (AbbonamentoScadutoException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento' è scaduto", e);
+        } catch (ServizioInZonaNonDisponibileException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il servizio non è erogato nella regione scelta", e);
         }
     }
 
-    @PostMapping(value="/spedizioneDaMagazzino/{idAbbonamentoMagazzino}/{idC}")//todo da verificare
+    @PostMapping(value="/spedizioneDaMagazzino/{idAbbonamentoMagazzino}/{idC}")//todo test
     public ResponseEntity spedizioneDaMagazzino(@PathVariable Integer idAbbonamentoMagazzino, @PathVariable Integer idC,@RequestBody IndirizzoIdMerci indirizzoDestAndMerci){
         try{
             Indirizzo indirizzoDestinazione = indirizzoDestAndMerci.getIndirizzo();
@@ -91,10 +95,12 @@ public class SpedizioneController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La merce non è disponibile poichè già in lavorazione per un'altra spedizione", e);
         } catch (MerceNonStoccataException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La merce non è  ancora disponibile per la lavorazione alla spedizione", e);
+        } catch (ServizioInZonaNonDisponibileException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il servizio non è erogato nella regione scelta", e);
         }
     }
 
-    @PutMapping(value= "/posticipaConsegna/{idSpedizione}")//todo da controllare
+    @PutMapping(value= "/posticipaConsegna/{idSpedizione}")
     public ResponseEntity posticipaConsegna (@PathVariable Integer idSpedizione,@RequestBody LocalDateTime d){
         try{
             System.out.println(d);
@@ -107,7 +113,6 @@ public class SpedizioneController {
         }
     }
 
-    //TODO Lista spedizioni effettuate dal cliente
     @GetMapping(value = "/effettuate/{idCliente}")
     public ResponseEntity spedizioneEffettuate(@PathVariable int idCliente){
         try {

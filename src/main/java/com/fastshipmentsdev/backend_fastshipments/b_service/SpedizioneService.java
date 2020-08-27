@@ -2,10 +2,7 @@ package com.fastshipmentsdev.backend_fastshipments.b_service;
 
 import com.fastshipmentsdev.backend_fastshipments.c_repository.*;
 import com.fastshipmentsdev.backend_fastshipments.d_entity.*;
-import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
-import com.fastshipmentsdev.backend_fastshipments.support.classi.MansioneDipendente;
-import com.fastshipmentsdev.backend_fastshipments.support.classi.StatoMerce;
-import com.fastshipmentsdev.backend_fastshipments.support.classi.StatoSpedizione;
+import com.fastshipmentsdev.backend_fastshipments.support.classi.*;
 import com.fastshipmentsdev.backend_fastshipments.support.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,9 +40,9 @@ public class SpedizioneService {
     @Autowired
     HubRepository hubRepository;
 
-    @Transactional(readOnly = false)
+    @Transactional(readOnly = false) //todo test dopo modifica hub
     public Spedizione aggiungi(int idCliente, Spedizione s, CartaCredito cartaCredito)
-            throws ClienteNonEsistenteException, PagamentoException {
+            throws ClienteNonEsistenteException, PagamentoException, ServizioInZonaNonDisponibileException {
         Optional<Cliente> c = clienteRepository.findById(idCliente);
         if(!c.isPresent()) throw new ClienteNonEsistenteException();
         Cliente cliente = c.get();
@@ -53,14 +50,35 @@ public class SpedizioneService {
         s.setPesoTassabile(s.getVolume()*300);
         s.getIndirizzoDestinazione().setProvincia(s.getIndirizzoDestinazione().getProvincia().toUpperCase());
 
-        Fattura f = generaFattura(cliente, cartaCredito, s);
-        s.setFattura(f);
+        //Fattura f = generaFattura(cliente, cartaCredito, s);
+        //s.setFattura(f);
+
         String regTMP = s.getIndirizzoDestinazione().getRegione();
         String regioneDest = Character.toString(regTMP.charAt(0)).toUpperCase()+regTMP.substring(1).toLowerCase();
         s.getIndirizzoDestinazione().setRegione(regioneDest);
 
-        Hub hubDestinazione = hubRepository.findByRegioneContaining(regioneDest);
-        Hub hubPartenza = hubRepository.findByRegioneContaining(Indirizzo.parse(cliente.getIndirizzo()).getRegione());
+        List<Hub> hubs = hubRepository.selAllHub();
+        Hub hubDestinazione = null;
+        for(Hub h : hubs){
+            IndirizzoHub ih = IndirizzoHub.parse(h.getIndirizzo());
+            if(ih.getRegione().toUpperCase().equals(regioneDest.toUpperCase()))
+                hubDestinazione = h;
+        }
+        Hub hubPartenza = null;
+        for(Hub h : hubs){
+            Indirizzo iC = Indirizzo.parse(cliente.getIndirizzo());
+            IndirizzoHub ih = IndirizzoHub.parse(h.getIndirizzo());
+            if(ih.getRegione().toUpperCase().equals(iC.getRegione().toUpperCase()))
+                hubPartenza = h;
+        }
+        if(hubPartenza == null || hubDestinazione == null) throw new ServizioInZonaNonDisponibileException();
+
+        Fattura f = generaFattura(cliente, cartaCredito, s);
+        s.setFattura(f);
+
+//        Hub hubDestinazione = hubRepository.findByRegioneContaining(regioneDest);
+//        Hub hubPartenza = hubRepository.findByRegioneContaining(Indirizzo.parse(cliente.getIndirizzo()).getRegione());
+
         s.setHubDestinazione(hubDestinazione);
         s.setHubPartenza(hubPartenza);
         s.setIndirizzoDestinatario(s.getIndirizzoDestinazione().toString());
@@ -104,10 +122,10 @@ public class SpedizioneService {
         return s.get();
     }
 
-    @Transactional(readOnly = false)
+    @Transactional(readOnly = false)  //todo test dopo modifica hub
     public Spedizione spedizioneDaAbbonamento(Integer idAbbonamentoSottoscritto, Integer idC, Spedizione s)
             throws ClienteNonEsistenteException, AbbonamentoNonEsistenteException,
-            AbbonamentoNonAssociatoException, SpedizioniTerminateException, AbbonamentoScadutoException{
+            AbbonamentoNonAssociatoException, SpedizioniTerminateException, AbbonamentoScadutoException, ServizioInZonaNonDisponibileException {
 
         Optional<Cliente> oC = clienteRepository.findById(idC);
         if(!oC.isPresent()) throw new ClienteNonEsistenteException();
@@ -137,8 +155,25 @@ public class SpedizioneService {
         String regioneDest = Character.toString(regTMP.charAt(0)).toUpperCase()+regTMP.substring(1).toLowerCase();
         s.getIndirizzoDestinazione().setRegione(regioneDest);
 
-        Hub hubDestinazione = hubRepository.findByRegioneContaining(regioneDest);
-        Hub hubPartenza = hubRepository.findByRegioneContaining(Indirizzo.parse(cliente.getIndirizzo()).getRegione());
+        List<Hub> hubs = hubRepository.selAllHub();
+        Hub hubDestinazione = null;
+        for(Hub h : hubs){
+            IndirizzoHub ih = IndirizzoHub.parse(h.getIndirizzo());
+            if(ih.getRegione().toUpperCase().equals(regioneDest.toUpperCase()))
+                hubDestinazione = h;
+        }
+        Hub hubPartenza = null;
+        for(Hub h : hubs){
+            Indirizzo iC = Indirizzo.parse(cliente.getIndirizzo());
+            IndirizzoHub ih = IndirizzoHub.parse(h.getIndirizzo());
+            if(iC.getRegione().toUpperCase().equals(ih.getRegione().toUpperCase()))
+                hubPartenza = h;
+        }
+
+        if(hubPartenza == null || hubDestinazione == null) throw new ServizioInZonaNonDisponibileException();
+
+//        Hub hubDestinazione = hubRepository.findByRegioneContaining(regioneDest);
+//        Hub hubPartenza = hubRepository.findByRegioneContaining(Indirizzo.parse(cliente.getIndirizzo()).getRegione());
         s.setHubDestinazione(hubDestinazione);
         s.setHubPartenza(hubPartenza);
         s.setIndirizzoDestinatario(s.getIndirizzoDestinazione().toString());
@@ -153,9 +188,9 @@ public class SpedizioneService {
     }
 
 
-    @Transactional(readOnly = false)
+    @Transactional(readOnly = false) //todo test dopo modifica hub
     public Spedizione spedizioneDaMagazzino(Integer idAbbonamentoMagazzino, Integer idC, List<Integer> idMerce, Indirizzo indirizzoDiDestinazione)
-            throws AbbonamentoNonEsistenteException, ClienteNonEsistenteException, MerceNonEsistenteException, MerceNonAssociataException, AbbonamentoNonAssociatoException, MerceNonStoccataException, MerceNonDisponibileException {
+            throws AbbonamentoNonEsistenteException, ClienteNonEsistenteException, MerceNonEsistenteException, MerceNonAssociataException, AbbonamentoNonAssociatoException, MerceNonStoccataException, MerceNonDisponibileException, ServizioInZonaNonDisponibileException {
         Optional<AbbonamentoMagazzinoSottoscritto> abbonamento = abbonamentoMagazzinoSottoscrittoRepository.findById(idAbbonamentoMagazzino);
         if(!abbonamento.isPresent())
             throw new AbbonamentoNonEsistenteException();
@@ -201,7 +236,17 @@ public class SpedizioneService {
         s.getIndirizzoDestinazione().setRegione(regioneDest);
         s.setIndirizzoDestinatario(s.getIndirizzoDestinazione().toString());
 
-        Hub hubDestinazione = hubRepository.findByRegioneContaining(regioneDest);
+        List<Hub> hubs = hubRepository.selAllHub();
+        Hub hubDestinazione = null;
+        for(Hub h : hubs){
+            IndirizzoHub ih = IndirizzoHub.parse(h.getIndirizzo());
+            if(ih.getRegione().toUpperCase().equals(regioneDest.toUpperCase()))
+                hubDestinazione = h;
+        }
+
+        if(hubDestinazione == null) throw new ServizioInZonaNonDisponibileException();
+
+//        Hub hubDestinazione = hubRepository.findByRegioneContaining(regioneDest);
         Hub hubPartenza = abbonamento.get().getHub();
         s.setHubDestinazione(hubDestinazione);
         s.setHubPartenza(hubPartenza);
