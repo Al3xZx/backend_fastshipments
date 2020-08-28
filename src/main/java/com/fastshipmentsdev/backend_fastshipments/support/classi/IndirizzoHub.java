@@ -73,7 +73,7 @@ public class IndirizzoHub {
 
     /**DEVE RICEVERE LA STRINGA FORMATTATA CORRETTAMENTE COME IL ToString()*/
     public static IndirizzoHub parse(String indirizzo){
-        IndirizzoHub ret = new IndirizzoHub();
+        /*IndirizzoHub ret = new IndirizzoHub();
         StringTokenizer st = new StringTokenizer(indirizzo, " ");
 
         st.nextToken();
@@ -85,12 +85,14 @@ public class IndirizzoHub {
         st.nextToken();
         ret.setVia(st.nextToken());
         st.nextToken();
-        ret.setCivico(st.nextToken());
+        ret.setCivico(st.nextToken());*/
 
+        String[] arSplit = indirizzo.split("\\s?[a-zA-Z]+:\\s");
+        IndirizzoHub ret = new IndirizzoHub(arSplit[1],arSplit[2],arSplit[3],arSplit[4],arSplit[5]);
         return ret;
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         /*
 ('1', 'Cosenza', 'Calabria', '150', '150');
 ('2', 'Trieste', 'FriuliVeneziaGiulia ', '150', '150');
@@ -101,10 +103,10 @@ public class IndirizzoHub {
 ('7', 'Napoli', 'Campania', '150', '150');
 ('8', 'Macerata', 'Marche', '150', '150');
 ('9', 'Firenze', 'Toscana', '150', '150');
- ('10', 'Palermo', 'Sicilia', '150', '150');*/
+ ('10', 'Palermo', 'Sicilia', '150', '150');
         IndirizzoHub[] hubs = new IndirizzoHub[10];
         hubs[0]= new IndirizzoHub("Calabria","Cosenza","CS","test", "25");
-        hubs[1]= new IndirizzoHub("FriuliVeneziaGiulia","Trieste","TS","test", "25");
+        hubs[1]= new IndirizzoHub("Friuli Venezia Giulia","Trieste","TS","test", "25");
         hubs[2]= new IndirizzoHub("Lombardia","Milano","MI","test", "25");
         hubs[3]= new IndirizzoHub("Veneto","Venezia","VE","test", "25");
         hubs[4]= new IndirizzoHub("Puglia","Taranto","TA","test", "25");
@@ -112,9 +114,12 @@ public class IndirizzoHub {
         hubs[6]= new IndirizzoHub("Campania","Napoli","NA","test", "25");
         hubs[7]= new IndirizzoHub("Marche","Macerata","MC","test", "25");
         hubs[8]= new IndirizzoHub("Toscana","Firenze","FI","test", "25");
-        hubs[9]= new IndirizzoHub("Sicilia","Palermo","PA","test", "25");
+        hubs[9]= new IndirizzoHub("Sicilia","Palermo","PA","test dei test", "25");
         for(IndirizzoHub ih : hubs){
             System.out.println(ih);
         }
-    }
+
+        IndirizzoHub i = IndirizzoHub.parse(hubs[9].toString());
+        System.out.println(i);
+    }*/
 }

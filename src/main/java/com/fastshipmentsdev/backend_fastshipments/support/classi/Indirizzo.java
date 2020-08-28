@@ -97,8 +97,10 @@ public class Indirizzo {
 
     /**DEVE RICEVERE LA STRINGA FORMATTATA CORRETTAMENTE COME IL ToString()*/
     public static Indirizzo parse(String indirizzo){
-        Indirizzo ret = new Indirizzo();
-        StringTokenizer st = new StringTokenizer(indirizzo, " ");
+        //Indirizzo ret = new Indirizzo();
+        String[] arSplit = indirizzo.split("\\s?[a-zA-Z]+:\\s");
+        Indirizzo ret = new Indirizzo(arSplit[1],arSplit[2],arSplit[3],arSplit[4],arSplit[5],arSplit[6],arSplit[7]);
+        /*StringTokenizer st = new StringTokenizer(indirizzo, " ");
 
         st.nextToken();
         ret.setRegione(st.nextToken());
@@ -113,17 +115,21 @@ public class Indirizzo {
         st.nextToken();
         ret.setVia(st.nextToken());
         st.nextToken();
-        ret.setCivico(st.nextToken());
+        ret.setCivico(st.nextToken());*/
 
         return ret;
     }
 
-//    public static void main(String[] args) {
-//        Indirizzo i = new Indirizzo("calabria","mangone","cs", "Paolo", "Cundari", "test", "25");
-//        System.out.println(i);
-//        Indirizzo i2 = Indirizzo.parse(i.toString());
-//        System.out.println("nuovo indirizzo");
-//        System.out.println(i);
-//    }
+    /*public static void main(String[] args) {
+        Indirizzo i = new Indirizzo("calabria","mangone","cs", "Paolo", "Cundari", "test dei test", "25");
+        System.out.println(i);
+        Indirizzo i2 = Indirizzo.parse(i.toString());
+        System.out.println("nuovo indirizzo");
+        System.out.println(i);
+
+//        String[] arSplit = i.toString().split("\\s?[a-zA-Z]+:\\s");
+//        for(int j = 0; j <arSplit.length; j++)
+//            System.out.println(j+": " + arSplit[j]);
+    }*/
 
 }
