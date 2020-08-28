@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping(value = "/abbonamento_magazzino")
+@CrossOrigin(origins="http://localhost:4200")
 public class AbbonamentoMagazzinoController {
 
     @Autowired

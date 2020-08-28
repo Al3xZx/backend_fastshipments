@@ -39,7 +39,7 @@ public class Cliente {
     @Column(length = 50)
     private String ragioneSociale;
 
-    private Integer pIva;
+    private String pIva;
 
     private String nome;
 
@@ -103,11 +103,11 @@ public class Cliente {
         this.ragioneSociale = ragioneSociale;
     }
 
-    public Integer getpIva() {
+    public String getpIva() {
         return pIva;
     }
 
-    public void setpIva(Integer pIva) {
+    public void setpIva(String pIva) {
         this.pIva = pIva;
     }
 

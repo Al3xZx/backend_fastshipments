@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping(value = "/abbonamento")
+@CrossOrigin(origins="http://localhost:4200")
 public class AbbonamentoController {
 
     @Autowired
