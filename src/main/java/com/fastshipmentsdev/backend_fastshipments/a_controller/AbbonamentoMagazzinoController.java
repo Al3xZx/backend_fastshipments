@@ -92,4 +92,9 @@ public class AbbonamentoMagazzinoController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non è associato al cliente", e);
         }
     }
+
+    @GetMapping(value = "/hub_disponibili")
+    public ResponseEntity hubDisponibili(){
+        return new ResponseEntity(abbonamentoMagazzinoService.hubDisponibili(), HttpStatus.OK);
+    }
 }

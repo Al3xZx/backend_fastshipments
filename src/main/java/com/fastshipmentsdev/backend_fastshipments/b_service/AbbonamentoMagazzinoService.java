@@ -167,4 +167,9 @@ public class AbbonamentoMagazzinoService {
         }
         return ret;
     }
+
+    @Transactional(readOnly = true)
+    public List<Hub> hubDisponibili(){
+        return hubRepository.selAllHub();
+    }
 }
