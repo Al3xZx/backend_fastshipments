@@ -8,6 +8,7 @@ import com.fastshipmentsdev.backend_fastshipments.support.exception.AnnuncioNonE
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,4 +31,10 @@ public class AnnuncioService {
         a.getCandidati().add(c);
         return c;
     }
+
+    public List<Annuncio> allAnnunci(){
+        return annuncioRepository.findAll();
+    }
+
+
 }

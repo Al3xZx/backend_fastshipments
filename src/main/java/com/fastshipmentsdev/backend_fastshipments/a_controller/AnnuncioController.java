@@ -28,4 +28,9 @@ public class AnnuncioController {
         }
 
     }
+
+    @GetMapping(value = "all_annunci")
+    public ResponseEntity allAnnunci(){
+        return new ResponseEntity(annuncioService.allAnnunci(), HttpStatus.OK);
+    }
 }

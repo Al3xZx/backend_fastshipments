@@ -3,7 +3,6 @@ package com.fastshipmentsdev.backend_fastshipments.d_entity;
 import com.fastshipmentsdev.backend_fastshipments.support.classi.Indirizzo;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "candidato")
@@ -30,7 +29,7 @@ public class Candidato {
     private String luogoNascita;
 
     @Column(nullable = false)
-    private String CF;
+    private String cf;
 
     @Column(nullable = false)
     private String titoloStudio;
@@ -86,12 +85,12 @@ public class Candidato {
         this.luogoNascita = luogoNascita;
     }
 
-    public String getCF() {
-        return CF;
+    public String getCf() {
+        return cf;
     }
 
-    public void setCF(String CF) {
-        this.CF = CF;
+    public void setCf(String cf) {
+        this.cf = cf;
     }
 
     public String getTitoloStudio() {
