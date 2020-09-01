@@ -24,6 +24,11 @@ public class AbbonamentoMagazzinoController {
         return new ResponseEntity(abbonamentoMagazzinoService.allAbbonamentiMagazzino(resForPage,page), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/all_abbonamenti_magazzino")
+    public ResponseEntity allAbbonamenti(){
+        return new ResponseEntity(abbonamentoMagazzinoService.allAbbonamentiMagazzino(), HttpStatus.OK);
+    }
+
     @PostMapping(value = "/sottoscrivi/{idCliente}/{idAbbonamento}/{idHub}")
     public ResponseEntity sottoscriviAbbonamento(
             @PathVariable int idCliente, @PathVariable int idAbbonamento, @PathVariable int idHub, @RequestBody CartaCredito cartaCredito){

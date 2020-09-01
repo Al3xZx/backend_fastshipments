@@ -46,6 +46,11 @@ public class AbbonamentoService {
         return abbonamentoRepository.selAll(PageRequest.of(page, resForPage));
     }
 
+    @Transactional(readOnly = true)
+    public List<Abbonamento> allAbbonamenti(){
+        return abbonamentoRepository.findAll();
+    }
+
     @Transactional(readOnly = false)
     public AbbonamentoSottoscritto sottoscriviAbbonamento(int idC, int idA, CartaCredito cartaCredito)
             throws ClienteNonEsistenteException, AbbonamentoNonEsistenteException, PagamentoException, ServizioInZonaNonDisponibileException {

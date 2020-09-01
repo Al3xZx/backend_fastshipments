@@ -27,6 +27,11 @@ public class AbbonamentoController {
         return new ResponseEntity(abbonamentoService.allAbbonamenti(resForPage,page), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/all_abbonamenti")
+    public ResponseEntity allAbbonamenti(){
+        return new ResponseEntity(abbonamentoService.allAbbonamenti(), HttpStatus.OK);
+    }
+
     @PostMapping(value = "/sottoscrivi/{idCliente}/{idAbbonamento}") //Todo da verificare
     public ResponseEntity sottoscriviAbbonamento(
             @PathVariable int idCliente, @PathVariable int idAbbonamento, @RequestBody CartaCredito cartaCredito){

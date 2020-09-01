@@ -42,8 +42,13 @@ public class AbbonamentoMagazzinoService {
 
 
     @Transactional(readOnly = true)
-    public List<Abbonamento> allAbbonamentiMagazzino(int resForPage, int page){
+    public List<AbbonamentoMagazzino> allAbbonamentiMagazzino(int resForPage, int page){
         return abbonamentoMagazzinoRepository.selAll(PageRequest.of(page, resForPage));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AbbonamentoMagazzino> allAbbonamentiMagazzino(){
+        return abbonamentoMagazzinoRepository.findAll();
     }
 
     @Transactional(readOnly = false)

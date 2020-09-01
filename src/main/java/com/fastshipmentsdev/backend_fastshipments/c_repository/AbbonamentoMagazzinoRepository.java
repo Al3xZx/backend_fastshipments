@@ -12,5 +12,5 @@ import java.util.List;
 @Repository
 public interface AbbonamentoMagazzinoRepository extends JpaRepository<AbbonamentoMagazzino, Integer> {
     @Query(value = "SELECT * FROM abbonamento_magazzino", nativeQuery = true)
-    List<Abbonamento> selAll(Pageable pageable);
+    List<AbbonamentoMagazzino> selAll(Pageable pageable);
 }
