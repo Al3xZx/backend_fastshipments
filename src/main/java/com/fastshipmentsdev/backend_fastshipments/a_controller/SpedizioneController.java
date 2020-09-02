@@ -26,7 +26,7 @@ public class SpedizioneController {
     @Autowired
     SpedizioneService spedizioneService;
 
-    @PostMapping(value = "/aggiungi_spedizione/{idCliente}") //Todo da verificare
+    @PostMapping(value = "/aggiungi_spedizione/{idCliente}")
     public ResponseEntity aggiungi(@PathVariable int idCliente, @RequestBody SpedizioCartaWrap SCW){
         try {
             Spedizione spedizione = SCW.getSpedizione();

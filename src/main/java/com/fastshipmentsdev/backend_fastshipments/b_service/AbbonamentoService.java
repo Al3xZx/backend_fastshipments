@@ -93,8 +93,8 @@ public class AbbonamentoService {
     private void pagamentoAbbonamento(Fattura fattura, CartaCredito cartaCredito) throws PagamentoException {
         double totale = fattura.getTotale();
         Optional<CartaCredito> oCC = cartaCreditoRepository.findById(cartaCredito.getNumero());
-        CartaCredito cartaCreditoP = oCC.get();
         if(!oCC.isPresent()) throw new PagamentoException();
+        CartaCredito cartaCreditoP = oCC.get();
         if(!cartaCreditoP.equals(cartaCredito)) throw new PagamentoException();
         if(cartaCreditoP.getSaldoDisponibile().compareTo(fattura.getTotale())<0)throw new PagamentoException();
         cartaCreditoP.setSaldoDisponibile(cartaCreditoP.getSaldoDisponibile()-totale);
