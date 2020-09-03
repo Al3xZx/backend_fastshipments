@@ -133,6 +133,7 @@ public class AbbonamentoMagazzinoService {
         AMS.setVolumeUtilizzato(AMS.getVolumeUtilizzato()+(volumeMerce*numeroMerci));
         merce.setProprietario(cliente);
         merce.setStato(StatoMerce.DA_RITIRARE);
+        merce.setAbbonamentoMagazzinoSottoscritto(AMS);
         List<Merce> ret = new LinkedList<>();
         for (int i = 0; i < numeroMerci; i++) {
             Merce mTMP = merceRepository.save(new Merce(merce));
@@ -166,12 +167,46 @@ public class AbbonamentoMagazzinoService {
         Hub hub = AMS.getHub();
         List<Merce> ret = new LinkedList<>();
         for (Merce m: oC.get().getMerceProprietario()) {
-            if(m.getScaffale() != null && m.getScaffale().getHub().getIdHub().equals(hub.getIdHub()) && m.getStato().equals(StatoMerce.STOCCATA))
+            if(m.getScaffale() != null && m.getAbbonamentoMagazzinoSottoscritto() != null
+                    && m.getAbbonamentoMagazzinoSottoscritto().getIdAbbonamento().equals(AMS.getIdAbbonamento())
+                    && m.getStato().equals(StatoMerce.STOCCATA) )
                 ret.add(m);
 
         }
         return ret;
     }
+
+//    @Transactional(readOnly = true)
+//    public List<Merce> merceInMagazzino(int idCliente)
+//            throws ClienteNonEsistenteException {
+//        Optional<Cliente> oC = clienteRepository.findById(idCliente);
+//        if(!oC.isPresent()) throw new ClienteNonEsistenteException();
+//        List<Merce> ret = new LinkedList<>();
+//        for (Merce m: oC.get().getMerceProprietario()) {
+//            if(/*!ret.contains(m) &&*/ m.getStato().equals(StatoMerce.STOCCATA)){
+////                m.setQta(merceRepository.contaMerceStoccata(m.getDescrizione()));
+//                ret.add(m);
+//            }
+//
+//        }
+//        return ret;
+//    }
+
+    @Transactional(readOnly = true)
+    public List<Merce> allMerce(int idCliente)
+            throws ClienteNonEsistenteException {
+        Optional<Cliente> oC = clienteRepository.findById(idCliente);
+        if(!oC.isPresent()) throw new ClienteNonEsistenteException();
+        List<Merce> ret = new LinkedList<>();
+        for (Merce m: oC.get().getMerceProprietario()) {
+            if(!ret.contains(m)){
+                m.setQta(merceRepository.contaMerce(m.getDescrizione()));
+                ret.add(m);
+            }
+        }
+        return ret;
+    }
+
 
     @Transactional(readOnly = true)
     public List<Hub> hubDisponibili(){

@@ -62,7 +62,7 @@ public class SpedizioneController {
         } catch(ClienteNonEsistenteException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
         }catch(AbbonamentoNonEsistenteException e ){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonaento non esiste", e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non esiste", e);
         }catch(AbbonamentoNonAssociatoException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento' non è associato al cliente", e);
         } catch (SpedizioniTerminateException e) {

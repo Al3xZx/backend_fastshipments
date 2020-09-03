@@ -91,10 +91,19 @@ public class AbbonamentoMagazzinoController {
             return new ResponseEntity(abbonamentoMagazzinoService.merceInMagazzino(idCliente, idAbbonamento), HttpStatus.OK);
         } catch (ClienteNonEsistenteException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
-        } catch (AbbonamentoNonEsistenteException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non esiste", e);
         } catch (AbbonamentoNonAssociatoException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non è associato al cliente", e);
+        } catch (AbbonamentoNonEsistenteException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'abbonamento non esiste", e);
+        }
+    }
+
+    @GetMapping(value = "/all_merce/{idCliente}")
+    public ResponseEntity allMerce(@PathVariable int idCliente){//todo test....
+        try {
+            return new ResponseEntity(abbonamentoMagazzinoService.allMerce(idCliente), HttpStatus.OK);
+        } catch (ClienteNonEsistenteException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cliente non esiste", e);
         }
     }
 

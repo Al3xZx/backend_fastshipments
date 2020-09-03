@@ -1,6 +1,7 @@
 package com.fastshipmentsdev.backend_fastshipments.d_entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
 
@@ -13,6 +14,14 @@ public class Merce {
     @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer idMerce;
+
+    @Transient
+    @JsonInclude
+    private Integer qta;
+
+    @ManyToOne
+    @JoinColumn(name = "abbonamento_magazzino_sottoscritto")
+    private AbbonamentoMagazzinoSottoscritto abbonamentoMagazzinoSottoscritto;
 
     @Column(nullable = false)
     private Double volume;//VOLUME OCCUPATO
@@ -128,6 +137,22 @@ public class Merce {
         this.descrizione = descrizione;
     }
 
+    public Integer getQta() {
+        return qta;
+    }
+
+    public void setQta(Integer qta) {
+        this.qta = qta;
+    }
+
+    public AbbonamentoMagazzinoSottoscritto getAbbonamentoMagazzinoSottoscritto() {
+        return abbonamentoMagazzinoSottoscritto;
+    }
+
+    public void setAbbonamentoMagazzinoSottoscritto(AbbonamentoMagazzinoSottoscritto abbonamentoMagazzinoSottoscritto) {
+        this.abbonamentoMagazzinoSottoscritto = abbonamentoMagazzinoSottoscritto;
+    }
+
     @Override
     public String toString() {
         return "Merce{" +
@@ -141,5 +166,20 @@ public class Merce {
                 ", spedizione=" + spedizione +
                 ", proprietario=" + proprietario +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Merce merce = (Merce) o;
+
+        return descrizione != null ? descrizione.equals(merce.descrizione) : merce.descrizione == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return descrizione != null ? descrizione.hashCode() : 0;
     }
 }
