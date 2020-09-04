@@ -200,7 +200,7 @@ public class AbbonamentoMagazzinoService {
         List<Merce> ret = new LinkedList<>();
         for (Merce m: oC.get().getMerceProprietario()) {
             if(!ret.contains(m)){
-                m.setQta(merceRepository.contaMerce(m.getDescrizione()));
+                m.setQta(merceRepository.contaMerce(m.getDescrizione(), m.getStato()));
                 ret.add(m);
             }
         }

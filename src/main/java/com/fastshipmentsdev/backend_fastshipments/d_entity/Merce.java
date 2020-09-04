@@ -63,6 +63,7 @@ public class Merce {
         this.stato = merce.stato;
         this.spedizione = merce.spedizione;
         this.proprietario = merce.proprietario;
+        this.abbonamentoMagazzinoSottoscritto = merce.abbonamentoMagazzinoSottoscritto;
     }
 
     public Integer getIdMerce() {
@@ -175,11 +176,14 @@ public class Merce {
 
         Merce merce = (Merce) o;
 
-        return descrizione != null ? descrizione.equals(merce.descrizione) : merce.descrizione == null;
+        if (descrizione != null ? !descrizione.equals(merce.descrizione) : merce.descrizione != null) return false;
+        return stato != null ? stato.equals(merce.stato) : merce.stato == null;
     }
 
     @Override
     public int hashCode() {
-        return descrizione != null ? descrizione.hashCode() : 0;
+        int result = descrizione != null ? descrizione.hashCode() : 0;
+        result = 31 * result + (stato != null ? stato.hashCode() : 0);
+        return result;
     }
 }

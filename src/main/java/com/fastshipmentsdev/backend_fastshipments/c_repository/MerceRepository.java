@@ -14,9 +14,9 @@ public interface MerceRepository extends JpaRepository<Merce, Integer> {
 
     @Query(value = "SELECT count(*) " +
                     "FROM merce " +
-                    "where merce.descrizione = ?1 " +
-                    "group by descrizione", nativeQuery = true)
-    Integer contaMerce(String descrizione);
+                    "where merce.descrizione = ?1 AND merce.stato = ?2 " +
+                    "group by descrizione, stato", nativeQuery = true)
+    Integer contaMerce(String descrizione, String stato);
 
 
     @Query(value = "SELECT count(*) " +
